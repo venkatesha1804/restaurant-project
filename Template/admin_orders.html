@@ -1,0 +1,264 @@
+{% extends "base.html" %}
+
+{% load static %}
+{% block class %}class="sub_page"{% endblock class %}
+{% block main %}
+
+  <!-- Admin Orders Dashboard -->
+  <section class="book_section layout_padding">
+    <div class="container-fluid">
+      <div class="heading_container">
+        <h2>📦 Order Management Dashboard</h2>
+      </div>
+
+      {% if messages %}
+        <div class="alert alert-info alert-dismissible fade show" role="alert">
+          {% for message in messages %}
+            <p>{{ message }}</p>
+          {% endfor %}
+          <button type="button" class="close" data-dismiss="alert" aria-label="Close">
+            <span>&times;</span>
+          </button>
+        </div>
+      {% endif %}
+
+      <!-- Statistics Cards -->
+      <div class="row" style="margin-bottom: 30px;">
+        <div class="col-md-2">
+          <div class="card" style="border: 1px solid #ddd; border-radius: 10px; padding: 20px; text-align: center; background: linear-gradient(135deg, #667eea 0%, #764ba2 100%); color: white;">
+            <h3 style="margin: 0;">{{ total_orders }}</h3>
+            <p style="margin: 5px 0 0 0; font-size: 12px;">Total Orders</p>
+          </div>
+        </div>
+        <div class="col-md-2">
+          <div class="card" style="border: 1px solid #ddd; border-radius: 10px; padding: 20px; text-align: center; background: linear-gradient(135deg, #f093fb 0%, #f5576c 100%); color: white;">
+            <h3 style="margin: 0;">{{ pending_orders }}</h3>
+            <p style="margin: 5px 0 0 0; font-size: 12px;">⏳ Pending</p>
+          </div>
+        </div>
+        <div class="col-md-2">
+          <div class="card" style="border: 1px solid #ddd; border-radius: 10px; padding: 20px; text-align: center; background: linear-gradient(135deg, #4facfe 0%, #00f2fe 100%); color: white;">
+            <h3 style="margin: 0;">{{ confirmed_orders }}</h3>
+            <p style="margin: 5px 0 0 0; font-size: 12px;">✓ Confirmed</p>
+          </div>
+        </div>
+        <div class="col-md-2">
+          <div class="card" style="border: 1px solid #ddd; border-radius: 10px; padding: 20px; text-align: center; background: linear-gradient(135deg, #fa709a 0%, #fee140 100%); color: white;">
+            <h3 style="margin: 0;">{{ preparing_orders }}</h3>
+            <p style="margin: 5px 0 0 0; font-size: 12px;">🍳 Preparing</p>
+          </div>
+        </div>
+        <div class="col-md-2">
+          <div class="card" style="border: 1px solid #ddd; border-radius: 10px; padding: 20px; text-align: center; background: linear-gradient(135deg, #30cfd0 0%, #330867 100%); color: white;">
+            <h3 style="margin: 0;">{{ ready_orders }}</h3>
+            <p style="margin: 5px 0 0 0; font-size: 12px;">✓ Ready</p>
+          </div>
+        </div>
+        <div class="col-md-2">
+          <div class="card" style="border: 1px solid #ddd; border-radius: 10px; padding: 20px; text-align: center; background: linear-gradient(135deg, #a8edea 0%, #fed6e3 100%); color: white;">
+            <h3 style="margin: 0;">{{ delivered_orders }}</h3>
+            <p style="margin: 5px 0 0 0; font-size: 12px;">✓ Delivered</p>
+          </div>
+        </div>
+      </div>
+
+      <!-- Revenue Cards -->
+      <div class="row" style="margin-bottom: 30px;">
+        <div class="col-md-6">
+          <div class="card" style="border: 1px solid #ddd; border-radius: 10px; padding: 20px; background-color: #f0f7ff;">
+            <h5 style="margin: 0; color: #0066cc; font-weight: bold;">💰 Total Revenue</h5>
+            <h2 style="margin: 10px 0 0 0; color: #0066cc; font-size: 32px;">${{ total_revenue|floatformat:2 }}</h2>
+            <p style="margin: 5px 0 0 0; font-size: 12px; color: #0066cc;">From all delivered orders</p>
+          </div>
+        </div>
+        <div class="col-md-6">
+          <div class="card" style="border: 1px solid #ddd; border-radius: 10px; padding: 20px; background-color: #fffbea;">
+            <h5 style="margin: 0; color: #cc8800; font-weight: bold;">📊 Pending Revenue</h5>
+            <h2 style="margin: 10px 0 0 0; color: #cc8800; font-size: 32px;">$0.00</h2>
+            <p style="margin: 5px 0 0 0; font-size: 12px; color: #cc8800;">Waiting for payment/delivery</p>
+          </div>
+        </div>
+      </div>
+
+      <!-- Filters & Search -->
+      <div class="card" style="border: 1px solid #ddd; border-radius: 10px; padding: 20px; margin-bottom: 30px;">
+        <h4 style="margin-bottom: 15px; font-weight: bold;">🔍 Filter Orders</h4>
+        
+        <form method="GET" action="{% url 'admin_orders' %}" style="display: flex; gap: 10px; flex-wrap: wrap;">
+          <!-- Status Filter -->
+          <select name="status" class="form-control" style="max-width: 200px;">
+            <option value="all" {% if status_filter == 'all' %}selected{% endif %}>All Status</option>
+            <option value="pending" {% if status_filter == 'pending' %}selected{% endif %}>⏳ Pending</option>
+            <option value="confirmed" {% if status_filter == 'confirmed' %}selected{% endif %}>✓ Confirmed</option>
+            <option value="preparing" {% if status_filter == 'preparing' %}selected{% endif %}>🍳 Preparing</option>
+            <option value="ready" {% if status_filter == 'ready' %}selected{% endif %}>✓ Ready</option>
+            <option value="delivered" {% if status_filter == 'delivered' %}selected{% endif %}>✓ Delivered</option>
+            <option value="cancelled" {% if status_filter == 'cancelled' %}selected{% endif %}>✗ Cancelled</option>
+          </select>
+
+          <!-- Search -->
+          <input type="text" name="search" class="form-control" placeholder="Search by name, phone, email..." value="{{ search_query }}" style="flex: 1; min-width: 250px;">
+
+          <!-- Buttons -->
+          <button type="submit" class="btn btn-primary">🔍 Search</button>
+          <a href="{% url 'admin_orders' %}" class="btn btn-outline-secondary">Clear Filters</a>
+        </form>
+      </div>
+
+      <!-- Orders Table -->
+      <div class="table-responsive">
+        <table class="table table-hover" style="border: 1px solid #ddd; border-radius: 10px; overflow: hidden;">
+          <thead style="background-color: #f8f9fa; border-bottom: 2px solid #ddd;">
+            <tr>
+              <th>Order ID</th>
+              <th>Customer</th>
+              <th>Items</th>
+              <th>Total</th>
+              <th>Status</th>
+              <th>Payment</th>
+              <th>Date</th>
+              <th>Action</th>
+            </tr>
+          </thead>
+          <tbody>
+            {% for order in orders %}
+            <tr>
+              <td>
+                <strong>#{{ order.id }}</strong>
+              </td>
+              <td>
+                <div>
+                  <p style="margin: 0; font-weight: 600;">{{ order.customer_name }}</p>
+                  <p style="margin: 3px 0; font-size: 12px; color: #999;">{{ order.customer_phone }}</p>
+                </div>
+              </td>
+              <td>
+                <span class="badge" style="background-color: #e9ecef; color: #333; padding: 5px 10px;">{{ order.get_total_items }} items</span>
+              </td>
+              <td>
+                <strong style="color: #ffbe33; font-size: 16px;">${{ order.total_amount }}</strong>
+              </td>
+              <td>
+                <select class="form-control status-select" data-order-id="{{ order.id }}" style="padding: 5px; font-size: 12px; border-radius: 5px;
+                  background-color:
+                    {% if order.status == 'pending' %}#fff3cd
+                    {% elif order.status == 'confirmed' %}#cfe2ff
+                    {% elif order.status == 'preparing' %}#cff4fc
+                    {% elif order.status == 'ready' %}#d1e7dd
+                    {% elif order.status == 'delivered' %}#d1e7dd
+                    {% else %}#f8d7da
+                    {% endif %};
+                ">
+                  <option value="pending" {% if order.status == 'pending' %}selected{% endif %}>⏳ Pending</option>
+                  <option value="confirmed" {% if order.status == 'confirmed' %}selected{% endif %}>✓ Confirmed</option>
+                  <option value="preparing" {% if order.status == 'preparing' %}selected{% endif %}>🍳 Preparing</option>
+                  <option value="ready" {% if order.status == 'ready' %}selected{% endif %}>✓ Ready</option>
+                  <option value="delivered" {% if order.status == 'delivered' %}selected{% endif %}>✓ Delivered</option>
+                  <option value="cancelled" {% if order.status == 'cancelled' %}selected{% endif %}>✗ Cancelled</option>
+                </select>
+              </td>
+              <td>
+                <span class="badge" style="
+                  background-color: 
+                    {% if order.payment_status == 'completed' %}#d1e7dd
+                    {% elif order.payment_status == 'pending' %}#fff3cd
+                    {% else %}#f8d7da
+                    {% endif %};
+                  color: #333;
+                  padding: 5px 10px;
+                ">
+                  {% if order.payment_status == 'completed' %}✓ Paid{% elif order.payment_status == 'pending' %}⏳ Pending{% else %}✗ Failed{% endif %}
+                </span>
+              </td>
+              <td>
+                <p style="margin: 0; font-size: 12px; color: #999;">{{ order.created_at|date:"M d, H:i" }}</p>
+              </td>
+              <td>
+                <a href="{% url 'admin_order_detail' order.id %}" class="btn btn-sm btn-outline-primary" style="padding: 5px 10px; font-size: 11px;">
+                  View Details
+                </a>
+              </td>
+            </tr>
+            {% empty %}
+            <tr>
+              <td colspan="8" style="text-align: center; padding: 40px;">
+                <p style="color: #999; font-size: 16px;">📭 No orders found</p>
+              </td>
+            </tr>
+            {% endfor %}
+          </tbody>
+        </table>
+      </div>
+
+      <!-- Pagination -->
+      {% if orders.has_other_pages %}
+      <nav aria-label="Page navigation" style="margin-top: 20px;">
+        <ul class="pagination" style="justify-content: center;">
+          {% if orders.has_previous %}
+          <li class="page-item">
+            <a class="page-link" href="?page=1{% if status_filter != 'all' %}&status={{ status_filter }}{% endif %}{% if search_query %}&search={{ search_query }}{% endif %}">First</a>
+          </li>
+          <li class="page-item">
+            <a class="page-link" href="?page={{ orders.previous_page_number }}{% if status_filter != 'all' %}&status={{ status_filter }}{% endif %}{% if search_query %}&search={{ search_query }}{% endif %}">Previous</a>
+          </li>
+          {% endif %}
+
+          <li class="page-item active">
+            <span class="page-link">Page {{ orders.number }} of {{ orders.paginator.num_pages }}</span>
+          </li>
+
+          {% if orders.has_next %}
+          <li class="page-item">
+            <a class="page-link" href="?page={{ orders.next_page_number }}{% if status_filter != 'all' %}&status={{ status_filter }}{% endif %}{% if search_query %}&search={{ search_query }}{% endif %}">Next</a>
+          </li>
+          <li class="page-item">
+            <a class="page-link" href="?page={{ orders.paginator.num_pages }}{% if status_filter != 'all' %}&status={{ status_filter }}{% endif %}{% if search_query %}&search={{ search_query }}{% endif %}">Last</a>
+          </li>
+          {% endif %}
+        </ul>
+      </nav>
+      {% endif %}
+
+    </div>
+  </section>
+
+  <!-- Update Status Script -->
+  <script>
+    document.querySelectorAll('.status-select').forEach(select => {
+      select.addEventListener('change', function() {
+        const orderId = this.getAttribute('data-order-id');
+        const newStatus = this.value;
+        const btn = this;
+
+        // Show loading
+        btn.disabled = true;
+        const originalText = btn.textContent;
+
+        fetch(`/admin/order/${orderId}/update-status/`, {
+          method: 'POST',
+          headers: {
+            'Content-Type': 'application/x-www-form-urlencoded',
+            'X-CSRFTOKEN': '{{ csrf_token }}'
+          },
+          body: `status=${newStatus}`
+        })
+        .then(response => response.json())
+        .then(data => {
+          if (data.success) {
+            alert(`✓ ${data.message}`);
+            location.reload();
+          } else {
+            alert(`✗ ${data.message}`);
+            btn.disabled = false;
+          }
+        })
+        .catch(error => {
+          console.error('Error:', error);
+          alert('Error updating order status');
+          btn.disabled = false;
+        });
+      });
+    });
+  </script>
+
+{% endblock main %}

@@ -1,0 +1,173 @@
+{% extends 'base.html' %}
+{% load static %}
+
+{% block class %}class="sub_page"{% endblock class %}
+
+{% block main %}
+<div class="container mt-5">
+    <div class="row">
+        <div class="col-12">
+            <h1 class="text-center mb-4">Admin Dashboard</h1>
+        </div>
+    </div>
+
+    <!-- Statistics Cards -->
+    <div class="row mb-4">
+        <div class="col-md-3">
+            <div class="card bg-primary text-white">
+                <div class="card-body">
+                    <h5 class="card-title">Total Items</h5>
+                    <h2>{{ total_items }}</h2>
+                </div>
+            </div>
+        </div>
+        <div class="col-md-3">
+            <div class="card bg-success text-white">
+                <div class="card-body">
+                    <h5 class="card-title">Categories</h5>
+                    <h2>{{ total_categories }}</h2>
+                </div>
+            </div>
+        </div>
+        <div class="col-md-3">
+            <div class="card bg-warning text-white">
+                <div class="card-body">
+                    <h5 class="card-title">Bookings</h5>
+                    <h2>{{ total_bookings }}</h2>
+                </div>
+            </div>
+        </div>
+        <div class="col-md-3">
+            <div class="card bg-info text-white">
+                <div class="card-body">
+                    <h5 class="card-title">Feedbacks</h5>
+                    <h2>{{ total_feedbacks }}</h2>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Menu Management Section -->
+    <div class="row">
+        <div class="col-12">
+            <div class="card">
+                <div class="card-header">
+                    <h3>Menu Management</h3>
+                </div>
+                <div class="card-body">
+                    <div class="row mb-3">
+                        <div class="col-md-6">
+                            <a href="/admin/Base_App/items/add/" class="btn btn-success">Add New Item</a>
+                            <a href="/admin/Base_App/itemlist/add/" class="btn btn-primary">Add New Category</a>
+                        </div>
+                        <div class="col-md-6 text-right">
+                            <a href="/admin/" class="btn btn-secondary">Go to Django Admin</a>
+                        </div>
+                    </div>
+
+                    <!-- Items Table -->
+                    <h4>Current Menu Items</h4>
+                    <div class="table-responsive">
+                        <table class="table table-striped">
+                            <thead>
+                                <tr>
+                                    <th>Image</th>
+                                    <th>Name</th>
+                                    <th>Category</th>
+                                    <th>Description</th>
+                                    <th>Price</th>
+                                    <th>Actions</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                {% for item in items %}
+                                <tr>
+                                    <td>
+                                        {% if item.Image %}
+                                            <img src="{{ item.Image.url }}" alt="{{ item.Item_name }}" style="width: 50px; height: 50px; object-fit: cover;">
+                                        {% else %}
+                                            No Image
+                                        {% endif %}
+                                    </td>
+                                    <td>{{ item.Item_name }}</td>
+                                    <td>{{ item.Category.Category_name }}</td>
+                                    <td>{{ item.description|truncatechars:50 }}</td>
+                                    <td>${{ item.Price }}</td>
+                                    <td>
+                                        <a href="/admin/Base_App/items/{{ item.id }}/change/" class="btn btn-sm btn-warning">Edit</a>
+                                        <a href="/admin/Base_App/items/{{ item.id }}/delete/" class="btn btn-sm btn-danger">Delete</a>
+                                    </td>
+                                </tr>
+                                {% endfor %}
+                            </tbody>
+                        </table>
+                    </div>
+
+                    <!-- Categories Table -->
+                    <h4 class="mt-4">Categories</h4>
+                    <div class="table-responsive">
+                        <table class="table table-striped">
+                            <thead>
+                                <tr>
+                                    <th>Category Name</th>
+                                    <th>Items Count</th>
+                                    <th>Actions</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                {% for category in categories %}
+                                <tr>
+                                    <td>{{ category.Category_name }}</td>
+                                    <td>{{ category.Name.count }}</td>
+                                    <td>
+                                        <a href="/admin/Base_App/itemlist/{{ category.id }}/change/" class="btn btn-sm btn-warning">Edit</a>
+                                        <a href="/admin/Base_App/itemlist/{{ category.id }}/delete/" class="btn btn-sm btn-danger">Delete</a>
+                                    </td>
+                                </tr>
+                                {% endfor %}
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Recent Bookings -->
+    <div class="row mt-4">
+        <div class="col-12">
+            <div class="card">
+                <div class="card-header">
+                    <h3>Recent Bookings</h3>
+                </div>
+                <div class="card-body">
+                    <div class="table-responsive">
+                        <table class="table table-striped">
+                            <thead>
+                                <tr>
+                                    <th>Name</th>
+                                    <th>Phone</th>
+                                    <th>Email</th>
+                                    <th>Persons</th>
+                                    <th>Date</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                {% for booking in bookings|slice:":10" %}
+                                <tr>
+                                    <td>{{ booking.Name }}</td>
+                                    <td>{{ booking.Phone_number }}</td>
+                                    <td>{{ booking.Email }}</td>
+                                    <td>{{ booking.Total_person }}</td>
+                                    <td>{{ booking.Booking_date }}</td>
+                                </tr>
+                                {% endfor %}
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock main %}

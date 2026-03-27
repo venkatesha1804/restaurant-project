@@ -1,0 +1,144 @@
+{% extends "base.html" %}
+
+{% block class %}class="sub_page"{% endblock class %}
+{% block menu_status %}active{% endblock menu_status %}
+{% load static %}
+
+{% block main %}
+
+  <!-- food section -->
+
+  <section class="food_section layout_padding-bottom">
+    <div class="container">
+      <div class="heading_container heading_center">
+        <h2>
+          Our Menu
+        </h2>
+      </div>
+
+      <ul class="filters_menu">
+        <li class="active" data-filter="*">All</li>
+        {% for i in list %}
+        <li data-filter=".{{i.category_name}}">{{i.category_name}}</li>
+        {% endfor %}
+      </ul>
+
+      <div class="filters-content">
+        <div class="row grid">
+          {% for j in items %}
+          <div class="col-sm-6 col-lg-4 all {{j.category.category_name}}">
+            <div class="box">
+              <div>
+                <div class="img-box">
+                  <img src="/media/{{j.image}}" alt="{{j.item_name}}">
+                </div>
+                <div class="detail-box">
+                  <h5>
+                    {{j.item_name}}
+                  </h5>
+                  <p>
+                    {{j.description}}
+                  </p>
+                  <div class="options">
+                    <h6>
+                      ${{j.price}}
+                    </h6>
+                    <button class="btn btn-success add-to-cart" data-item-id="{{j.id}}" data-item-name="{{j.item_name}}" data-item-price="{{j.price}}">
+                      🛒 Add to Cart
+                    </button>
+                  </div>
+                </div>
+              </div>
+            </div>
+          </div>
+          {% endfor %}
+        </div>
+      </div>
+      <div class="btn-box">
+        <a href="{% url 'view_cart' %}" class="btn btn-primary">
+          View Cart
+        </a>
+      </div>
+    </div>
+  </section>
+
+  <!-- end food section -->
+
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/jquery/3.6.0/jquery.min.js"></script>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/jquery.isotope/3.0.6/isotope.pkgd.min.js"></script>
+
+  <script>
+    $(document).ready(function() {
+      var $grid = $('.grid').isotope({
+        itemSelector: '.all',
+        layoutMode: 'fitRows'
+      });
+
+      $('.filters_menu').on('click', 'li', function() {
+        var filterValue = $(this).attr('data-filter');
+        $grid.isotope({ filter: filterValue });
+        
+        $(this).siblings().removeClass('active');
+        $(this).addClass('active');
+      });
+    });
+
+    // Add to Cart
+    document.querySelectorAll('.add-to-cart').forEach(button => {
+      button.addEventListener('click', function(e) {
+        e.preventDefault();
+        
+        const itemId = this.getAttribute('data-item-id');
+        const itemName = this.getAttribute('data-item-name');
+        const itemPrice = this.getAttribute('data-item-price');
+        const btn = this;
+        
+        // Disable button temporarily
+        btn.disabled = true;
+        const originalText = btn.textContent;
+        btn.textContent = '⏳ Adding...';
+  
+        fetch(`/add-to-cart/${itemId}/`, {
+          method: 'POST',
+          headers: {
+            'Content-Type': 'application/x-www-form-urlencoded',
+            'X-CSRFTOKEN': '{{ csrf_token }}'
+          },
+          body: 'quantity=1'
+        })
+        .then(response => response.json())
+        .then(data => {
+          if (data.success) {
+            // Show success message
+            btn.textContent = '✓ Added!';
+            btn.style.backgroundColor = '#28a745';
+            
+            // Reset button after 2 seconds
+            setTimeout(() => {
+              btn.textContent = originalText;
+              btn.style.backgroundColor = '';
+              btn.disabled = false;
+            }, 2000);
+            
+            // Optional: Update cart count in header if you add it later
+            console.log(`Cart count: ${data.cart_count}, Total: $${data.total_price}`);
+            
+            // Show alert
+            alert(`✓ ${itemName} added to cart!`);
+          } else {
+            alert(`✗ ${data.message}`);
+            btn.disabled = false;
+            btn.textContent = originalText;
+          }
+        })
+        .catch(error => {
+          console.error('Error:', error);
+          alert('Error adding item to cart');
+          btn.disabled = false;
+          btn.textContent = originalText;
+        });
+      });
+    });
+  </script>
+
+{% endblock main %}

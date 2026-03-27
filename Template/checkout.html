@@ -1,0 +1,207 @@
+{% extends "base.html" %}
+
+{% load static %}
+{% block class %}class="sub_page"{% endblock class %}
+{% block main %}
+
+  <!-- Checkout Section -->
+  <section class="book_section layout_padding">
+    <div class="container">
+      <div class="heading_container">
+        <h2>
+          📋 Checkout
+        </h2>
+      </div>
+
+      {% if messages %}
+        <div class="alert alert-info alert-dismissible fade show" role="alert">
+          {% for message in messages %}
+            <p>{{ message }}</p>
+          {% endfor %}
+          <button type="button" class="close" data-dismiss="alert" aria-label="Close">
+            <span>&times;</span>
+          </button>
+        </div>
+      {% endif %}
+
+      <div class="row">
+        <!-- Checkout Form -->
+        <div class="col-md-7">
+          <div class="form_container">
+            <h4 style="margin-bottom: 20px; font-weight: bold;">Delivery Details</h4>
+            
+            <form method="POST" action="{% url 'checkout' %}">
+              {% csrf_token %}
+
+              <!-- Customer Info Section -->
+              <fieldset style="border: 1px solid #ddd; padding: 15px; border-radius: 5px; margin-bottom: 20px;">
+                <legend style="padding: 0 10px; font-weight: bold;">👤 Your Information</legend>
+
+                <div>
+                  <label for="customer_name" style="font-weight: 600; margin-top: 10px; display: block;">Full Name *</label>
+                  <input type="text" id="customer_name" name="customer_name" class="form-control" 
+                         value="{% if user.is_authenticated %}{{ user.first_name }} {{ user.last_name }}{% endif %}"
+                         required placeholder="Enter your full name" />
+                </div>
+
+                <div style="margin-top: 15px;">
+                  <label for="customer_email" style="font-weight: 600; display: block;">Email Address *</label>
+                  <input type="email" id="customer_email" name="customer_email" class="form-control" 
+                         value="{% if user.is_authenticated %}{{ user.email }}{% endif %}"
+                         required placeholder="your.email@example.com" />
+                </div>
+
+                <div style="margin-top: 15px;">
+                  <label for="customer_phone" style="font-weight: 600; display: block;">Phone Number *</label>
+                  <input type="tel" id="customer_phone" name="customer_phone" class="form-control" 
+                         required placeholder="+91 XXXXX XXXXX" />
+                </div>
+              </fieldset>
+
+              <!-- Delivery Type -->
+              <fieldset style="border: 1px solid #ddd; padding: 15px; border-radius: 5px; margin-bottom: 20px;">
+                <legend style="padding: 0 10px; font-weight: bold;">🚗 Delivery Type</legend>
+
+                <div style="display: flex; gap: 30px; margin-top: 10px;">
+                  <div>
+                    <input type="radio" id="delivery" name="delivery_type" value="delivery" checked>
+                    <label for="delivery" style="margin-left: 10px; cursor: pointer;">🚗 Home Delivery</label>
+                  </div>
+                  <div>
+                    <input type="radio" id="pickup" name="delivery_type" value="pickup">
+                    <label for="pickup" style="margin-left: 10px; cursor: pointer;">🏪 Pickup</label>
+                  </div>
+                </div>
+              </fieldset>
+
+              <!-- Delivery Address -->
+              <fieldset style="border: 1px solid #ddd; padding: 15px; border-radius: 5px; margin-bottom: 20px;">
+                <legend style="padding: 0 10px; font-weight: bold;">📍 Delivery Address</legend>
+
+                <div style="margin-top: 10px;">
+                  <label for="delivery_address" style="font-weight: 600; display: block;">Full Address *</label>
+                  <textarea id="delivery_address" name="delivery_address" class="form-control" rows="3" 
+                           required placeholder="Enter complete delivery address (House No., Street, Landmark)"></textarea>
+                </div>
+
+                <div style="margin-top: 15px;">
+                  <label for="delivery_city" style="font-weight: 600; display: block;">City *</label>
+                  <input type="text" id="delivery_city" name="delivery_city" class="form-control" 
+                         value="Bangalore" required placeholder="City name" />
+                </div>
+
+                <div style="margin-top: 15px;">
+                  <label for="delivery_pincode" style="font-weight: 600; display: block;">Pincode/Postal Code *</label>
+                  <input type="text" id="delivery_pincode" name="delivery_pincode" class="form-control" 
+                         required placeholder="6-digit pincode" />
+                </div>
+              </fieldset>
+
+              <!-- Special Requests -->
+              <fieldset style="border: 1px solid #ddd; padding: 15px; border-radius: 5px; margin-bottom: 20px;">
+                <legend style="padding: 0 10px; font-weight: bold;">📝 Special Requests (Optional)</legend>
+
+                <div style="margin-top: 10px;">
+                  <textarea id="special_requests" name="special_requests" class="form-control" rows="3" 
+                           placeholder="Any special instructions? (e.g., allergies, preferences, packaging requests)"></textarea>
+                </div>
+              </fieldset>
+
+              <!-- Submit Button -->
+              <div style="margin-top: 20px;">
+                <button type="submit" class="btn btn-success" style="width: 100%; padding: 12px; font-size: 16px;">
+                  Continue to Payment ➜
+                </button>
+              </div>
+
+              <a href="{% url 'view_cart' %}" class="btn btn-outline-secondary" style="width: 100%; padding: 12px; margin-top: 10px;">
+                ← Back to Cart
+              </a>
+            </form>
+          </div>
+        </div>
+
+        <!-- Order Summary Sidebar -->
+        <div class="col-md-5">
+          <div class="card" style="border: 1px solid #ddd; border-radius: 10px; padding: 20px; position: sticky; top: 20px;">
+            <h4 style="margin-bottom: 20px; font-weight: bold;">📦 Order Summary</h4>
+            
+            <!-- Cart Items -->
+            <div style="max-height: 300px; overflow-y: auto; margin-bottom: 20px; border-bottom: 1px solid #eee; padding-bottom: 15px;">
+              {% for cart_item in cart_items %}
+              <div style="display: flex; justify-content: space-between; margin-bottom: 12px; padding-bottom: 12px; border-bottom: 1px solid #f0f0f0;">
+                <div>
+                  <strong>{{ cart_item.item.item_name }}</strong>
+                  <p style="font-size: 12px; color: #999; margin: 3px 0;">Qty: {{ cart_item.quantity }}</p>
+                </div>
+                <div style="text-align: right;">
+                  <strong>${{ cart_item.get_subtotal }}</strong>
+                </div>
+              </div>
+              {% endfor %}
+            </div>
+
+            <!-- Pricing Breakdown -->
+            <div style="margin-bottom: 15px; padding-bottom: 10px; border-bottom: 1px solid #eee;">
+              <div style="display: flex; justify-content: space-between; margin-bottom: 10px;">
+                <span>Subtotal:</span>
+                <strong>${{ total_price }}</strong>
+              </div>
+              <div style="display: flex; justify-content: space-between; margin-bottom: 10px;">
+                <span>Delivery Charge:</span>
+                <strong style="color: #ffbe33;">FREE</strong>
+              </div>
+              <div style="display: flex; justify-content: space-between; margin-bottom: 10px;">
+                <span>Tax & Fees:</span>
+                <strong>$0.00</strong>
+              </div>
+            </div>
+
+            <!-- Total -->
+            <div style="display: flex; justify-content: space-between; font-size: 18px; margin-bottom: 20px;">
+              <span style="font-weight: bold;">Total Amount:</span>
+              <strong style="color: #ffbe33;">${{ total_price }}</strong>
+            </div>
+
+            <!-- Info Box -->
+            <div style="background-color: #f8f9fa; padding: 15px; border-radius: 5px; margin-top: 20px;">
+              <p style="font-size: 12px; color: #666; margin: 0;">
+                <strong>ℹ️ Note:</strong> You will be able to track your order status after checkout. We'll send you updates via email and SMS.
+              </p>
+            </div>
+
+            <!-- Items Count -->
+            <div style="background-color: #e8f5e9; padding: 12px; border-radius: 5px; margin-top: 15px; text-align: center;">
+              <p style="margin: 0; color: #2e7d32; font-weight: 600;">
+                🛒 {{ total_items }} items in your order
+              </p>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <style>
+    fieldset {
+      margin-bottom: 20px;
+    }
+
+    legend {
+      font-weight: bold;
+      color: #333;
+    }
+
+    .form-control {
+      border: 1px solid #ddd;
+      border-radius: 5px;
+      padding: 10px;
+    }
+
+    .form-control:focus {
+      border-color: #ffbe33;
+      box-shadow: 0 0 5px rgba(255, 190, 51, 0.3);
+    }
+  </style>
+
+{% endblock main %}

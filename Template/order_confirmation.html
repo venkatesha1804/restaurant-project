@@ -1,0 +1,183 @@
+{% extends "base.html" %}
+
+{% load static %}
+{% block class %}class="sub_page"{% endblock class %}
+{% block main %}
+
+  <!-- Order Confirmation Section -->
+  <section class="book_section layout_padding">
+    <div class="container">
+      
+      <!-- Success Header -->
+      <div style="text-align: center; margin-bottom: 40px;">
+        <div style="font-size: 60px; color: #28a745; margin-bottom: 15px;">✅</div>
+        <h2 style="color: #28a745; margin-bottom: 10px;">Order Confirmed!</h2>
+        <p style="font-size: 16px; color: #666;">Thank you for your order. We're preparing your delicious food!</p>
+      </div>
+
+      <div class="row">
+        <!-- Order Details Card -->
+        <div class="col-md-7">
+          <div class="card" style="border: 1px solid #ddd; border-radius: 10px; padding: 25px; margin-bottom: 20px;">
+            
+            <!-- Order ID -->
+            <div style="background-color: #f0f7ff; padding: 15px; border-radius: 5px; margin-bottom: 20px; text-align: center;">
+              <p style="margin: 0; color: #0066cc; font-size: 12px; font-weight: 600;">ORDER NUMBER</p>
+              <h3 style="margin: 5px 0 0 0; color: #0066cc; font-family: monospace;">#{{ order.id }}</h3>
+            </div>
+
+            <!-- Customer Info -->
+            <h4 style="margin-bottom: 15px; font-weight: bold;">📋 Customer Details</h4>
+            <div style="background-color: #f9f9f9; padding: 15px; border-radius: 5px; margin-bottom: 20px;">
+              <p style="margin: 8px 0;"><strong>Name:</strong> {{ order.customer_name }}</p>
+              <p style="margin: 8px 0;"><strong>Email:</strong> {{ order.customer_email }}</p>
+              <p style="margin: 8px 0;"><strong>Phone:</strong> {{ order.customer_phone }}</p>
+            </div>
+
+            <!-- Delivery Info -->
+            <h4 style="margin-bottom: 15px; font-weight: bold;">📍 Delivery Information</h4>
+            <div style="background-color: #f9f9f9; padding: 15px; border-radius: 5px; margin-bottom: 20px;">
+              <p style="margin: 8px 0;">
+                <strong>Delivery Type:</strong> 
+                {% if order.delivery_type == 'delivery' %}
+                  🚗 Home Delivery
+                {% else %}
+                  🏪 Pickup
+                {% endif %}
+              </p>
+              <p style="margin: 8px 0;"><strong>Address:</strong></p>
+              <p style="margin: 5px 0; color: #666;">{{ order.delivery_address }}</p>
+              <p style="margin: 5px 0; color: #666;">{{ order.delivery_city }} - {{ order.delivery_pincode }}</p>
+            </div>
+
+            <!-- Order Items -->
+            <h4 style="margin-bottom: 15px; font-weight: bold;">🍕 Your Order</h4>
+            <div style="background-color: #f9f9f9; padding: 15px; border-radius: 5px; margin-bottom: 20px;">
+              {% for item in order_items %}
+              <div style="display: flex; justify-content: space-between; margin-bottom: 12px; padding-bottom: 12px; border-bottom: 1px solid #eee;">
+                <div>
+                  <p style="margin: 0; font-weight: 600;">{{ item.item.item_name }}</p>
+                  <p style="margin: 3px 0; font-size: 12px; color: #999;">Qty: {{ item.quantity }}</p>
+                </div>
+                <div style="text-align: right;">
+                  <p style="margin: 0; font-weight: 600;">${{ item.subtotal }}</p>
+                </div>
+              </div>
+              {% endfor %}
+            </div>
+
+            <!-- Special Requests -->
+            {% if order.special_requests %}
+            <h4 style="margin-bottom: 15px; font-weight: bold;">📝 Special Requests</h4>
+            <div style="background-color: #fffbea; padding: 15px; border-radius: 5px; margin-bottom: 20px; border-left: 4px solid #ffbe33;">
+              <p style="margin: 0; color: #666;">{{ order.special_requests }}</p>
+            </div>
+            {% endif %}
+
+          </div>
+        </div>
+
+        <!-- Order Summary & Status Sidebar -->
+        <div class="col-md-5">
+          <!-- Order Summary -->
+          <div class="card" style="border: 1px solid #ddd; border-radius: 10px; padding: 20px; margin-bottom: 20px;">
+            <h4 style="margin-bottom: 20px; font-weight: bold;">💰 Order Summary</h4>
+            
+            <div style="margin-bottom: 15px; padding-bottom: 10px; border-bottom: 1px solid #eee;">
+              <div style="display: flex; justify-content: space-between; margin-bottom: 10px;">
+                <span>Subtotal ({{ total_items }} items):</span>
+                <strong>${{ order.total_amount }}</strong>
+              </div>
+              <div style="display: flex; justify-content: space-between; margin-bottom: 10px;">
+                <span>Delivery Charge:</span>
+                <strong style="color: #28a745;">FREE</strong>
+              </div>
+              <div style="display: flex; justify-content: space-between;">
+                <span>Tax & Fees:</span>
+                <strong>$0.00</strong>
+              </div>
+            </div>
+
+            <div style="display: flex; justify-content: space-between; font-size: 18px; margin-bottom: 20px;">
+              <span style="font-weight: bold;">Total:</span>
+              <strong style="color: #ffbe33; font-size: 20px;">${{ order.total_amount }}</strong>
+            </div>
+
+            <!-- Payment Status -->
+            <div style="background-color: #fff3cd; padding: 12px; border-radius: 5px; margin-bottom: 20px; border-left: 4px solid #ffc107;">
+              <p style="margin: 0; font-size: 12px; color: #856404; font-weight: 600;">⏳ PAYMENT PENDING</p>
+              <p style="margin: 5px 0 0 0; font-size: 12px; color: #856404;">Payment gateway integration coming soon. You can also pay at pickup/delivery.</p>
+            </div>
+          </div>
+
+          <!-- Order Status -->
+          <div class="card" style="border: 1px solid #ddd; border-radius: 10px; padding: 20px; margin-bottom: 20px;">
+            <h4 style="margin-bottom: 20px; font-weight: bold;">📦 Order Status</h4>
+            
+            <div style="display: flex; align-items: center; margin-bottom: 15px;">
+              <div style="width: 40px; height: 40px; background-color: #28a745; border-radius: 50%; display: flex; align-items: center; justify-content: center; color: white; font-weight: bold; margin-right: 15px;">✓</div>
+              <div>
+                <p style="margin: 0; font-weight: 600;">Order Received</p>
+                <p style="margin: 3px 0; font-size: 12px; color: #999;">{{ order.created_at|date:"M d, Y H:i" }}</p>
+              </div>
+            </div>
+
+            <div style="display: flex; align-items: center; margin-bottom: 15px;">
+              <div style="width: 40px; height: 40px; background-color: #e0e0e0; border-radius: 50%; display: flex; align-items: center; justify-content: center; color: white; font-weight: bold; margin-right: 15px;">⏳</div>
+              <div>
+                <p style="margin: 0; font-weight: 600;">Confirmed</p>
+                <p style="margin: 3px 0; font-size: 12px; color: #999;">Coming soon</p>
+              </div>
+            </div>
+
+            <div style="display: flex; align-items: center; margin-bottom: 15px;">
+              <div style="width: 40px; height: 40px; background-color: #e0e0e0; border-radius: 50%; display: flex; align-items: center; justify-content: center; color: white; font-weight: bold; margin-right: 15px;">🍳</div>
+              <div>
+                <p style="margin: 0; font-weight: 600;">Preparing</p>
+                <p style="margin: 3px 0; font-size: 12px; color: #999;">Coming soon</p>
+              </div>
+            </div>
+
+            <div style="display: flex; align-items: center;">
+              <div style="width: 40px; height: 40px; background-color: #e0e0e0; border-radius: 50%; display: flex; align-items: center; justify-content: center; color: white; font-weight: bold; margin-right: 15px;">🚗</div>
+              <div>
+                <p style="margin: 0; font-weight: 600;">Delivered</p>
+                <p style="margin: 3px 0; font-size: 12px; color: #999;">Coming soon</p>
+              </div>
+            </div>
+          </div>
+
+          <!-- Next Steps -->
+          <div class="card" style="border: 1px solid #ddd; border-radius: 10px; padding: 20px; background-color: #f0f7ff;">
+            <h4 style="margin-bottom: 15px; font-weight: bold;">📧 What's Next?</h4>
+            <ul style="margin: 0; padding-left: 20px; font-size: 14px; color: #666;">
+              <li style="margin-bottom: 10px;">We'll send you a confirmation email shortly</li>
+              <li style="margin-bottom: 10px;">Track your order status anytime</li>
+              <li style="margin-bottom: 10px;">We'll notify you when your food is ready</li>
+              <li>Enjoy your delicious meal! 🍽️</li>
+            </ul>
+          </div>
+
+          <!-- Action Buttons -->
+          <div style="margin-top: 20px;">
+            <a href="{% url 'order_history' %}" class="btn btn-primary" style="width: 100%; padding: 12px; text-align: center; display: block; margin-bottom: 10px;">
+              View All Orders
+            </a>
+            <a href="{% url 'Menu' %}" class="btn btn-outline-secondary" style="width: 100%; padding: 12px; text-align: center; display: block;">
+              Continue Shopping
+            </a>
+          </div>
+        </div>
+      </div>
+
+      <!-- Contact Support -->
+      <div style="text-align: center; margin-top: 40px; padding: 20px; background-color: #f9f9f9; border-radius: 10px;">
+        <p style="margin: 0; color: #666;">
+          <strong>Need Help?</strong> Call us at <strong>+91 9876543210</strong> or email <strong>support@feanefoods.com</strong>
+        </p>
+      </div>
+
+    </div>
+  </section>
+
+{% endblock main %}

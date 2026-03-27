@@ -1,0 +1,210 @@
+<!DOCTYPE html>
+<html>
+{% load static %}
+
+<head>
+  <meta charset="utf-8" />
+  <meta http-equiv="X-UA-Compatible" content="IE=edge" />
+  <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no" />
+  <link rel="shortcut icon" href="{% static 'images/favicon.png' %}" type="">
+  <title>Feane</title>
+
+  <!-- Styles -->
+  <link rel="stylesheet" type="text/css" href="{% static 'css/bootstrap.css' %}" />
+  <link rel="stylesheet" type="text/css" href="https://cdnjs.cloudflare.com/ajax/libs/OwlCarousel2/2.3.4/assets/owl.carousel.min.css" />
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/jquery-nice-select/1.1.0/css/nice-select.min.css" />
+  <link href="{% static 'css/font-awesome.min.css' %}" rel="stylesheet" />
+  <link href="{% static 'css/style.css' %}" rel="stylesheet" />
+  <link href="{% static 'css/responsive.css' %}" rel="stylesheet" />
+</head>
+
+<body {% block class %}{% endblock class %}>
+  <div class="hero_area">
+    <div class="bg-box">
+      <img src="{% static 'images/hero-bg.jpg' %}" alt="">
+    </div>
+
+    <!-- Header -->
+    <header class="header_section">
+      <div class="container">
+        <div style="display: flex; align-items: center; justify-content: space-between; gap: 20px;">
+          <a class="navbar-brand" href="{% url 'Home' %}">
+            <span>Feane</span>
+          </a>
+
+          <ul style="display: flex; list-style: none; gap: 30px; margin: 0; padding: 0; align-items: center;">
+            <li>
+              <a class="nav-link" href="{% url 'Home' %}" style="color: #ffffff; text-transform: uppercase; font-size: 14px; padding: 5px 20px; transition: all 0.3s;">Home</a>
+            </li>
+            <li>
+              <a class="nav-link" href="{% url 'Menu' %}" style="color: #ffffff; text-transform: uppercase; font-size: 14px; padding: 5px 20px; transition: all 0.3s;">Menu</a>
+            </li>
+            <li>
+              <a class="nav-link" href="{% url 'About' %}" style="color: #ffffff; text-transform: uppercase; font-size: 14px; padding: 5px 20px; transition: all 0.3s;">About</a>
+            </li>
+            <li>
+              <a class="nav-link" href="{% url 'Book_Table' %}" style="color: #ffffff; text-transform: uppercase; font-size: 14px; padding: 5px 20px; transition: all 0.3s;">Book Table</a>
+            </li>
+            <li>
+              <a class="nav-link" href="{% url 'Feedback_Form' %}" style="color: #ffffff; text-transform: uppercase; font-size: 14px; padding: 5px 20px; transition: all 0.3s;">Feedback</a>
+            </li>
+            {% if user.is_authenticated %}
+            <li>
+              <a class="nav-link" href="{% url 'admin_dashboard' %}" style="color: #ffffff; text-transform: uppercase; font-size: 14px; padding: 5px 20px; transition: all 0.3s;">Dashboard</a>
+            </li>
+            {% endif %}
+          </ul>
+
+          <!-- Login / Logout / Cart Section -->
+          <div class="user_option">
+            <!-- Shopping Cart Icon -->
+            <a href="{% url 'view_cart' %}" style="position: relative; display: inline-block; margin-right: 15px; text-decoration: none;">
+              <span style="font-size: 24px; color: #ffffff;">🛒</span>
+              <span id="cart-count" style="
+                position: absolute;
+                top: -8px;
+                right: -8px;
+                background-color: #ffbe33;
+                color: #000;
+                border-radius: 50%;
+                width: 24px;
+                height: 24px;
+                display: flex;
+                align-items: center;
+                justify-content: center;
+                font-size: 12px;
+                font-weight: bold;
+              ">0</span>
+            </a>
+
+            {% if user.is_authenticated %}
+              <span style="background-color: #f8c6c6; color: #000; padding: 5px 10px; border-radius: 5px; font-weight: bold;">
+                {{ user.username }}
+              </span>
+              <form method="POST" action="{% url 'logout' %}" style="display:inline;">
+                {% csrf_token %}
+                <button type="submit" class="btn btn-secondary">Logout</button>
+              </form>
+            {% else %}
+              <a href="{% url 'login' %}" class="btn order_online">Login</a>
+            {% endif %}
+          </div>
+        </div>
+      </div>
+    </header>
+    <!-- End Header -->
+
+    <!-- Cart Modal (Optional - for quick view) -->
+    <div id="cart-modal" class="modal fade" tabindex="-1" role="dialog">
+      <div class="modal-dialog" role="document">
+        <div class="modal-content">
+          <div class="modal-header">
+            <h5 class="modal-title">Your Cart</h5>
+            <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+              <span>&times;</span>
+            </button>
+          </div>
+          <div class="modal-body">
+            <ul id="cart-items-list">
+              <!-- Items will load here -->
+            </ul>
+          </div>
+          <div class="modal-footer">
+            <a href="{% url 'view_cart' %}" class="btn btn-success">View Full Cart</a>
+            <button type="button" class="btn btn-secondary" data-dismiss="modal">Close</button>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    {% block slider %}{% endblock slider %}
+  </div>
+
+  {% block main %}{% endblock main %}
+
+  <!-- Footer -->
+  <footer class="footer_section">
+    <div class="container">
+      <div class="row">
+        <div class="col-md-4 footer-col">
+          <div class="footer_contact">
+            <h4>Contact Us</h4>
+            <div class="contact_link_box">
+              <a href="#"><i class="fa fa-map-marker"></i>Koramangala, Bangalore  </a>
+              <a href="#"><i class="fa fa-phone"></i> Call +91 9876543210</a>
+              <a href="#"><i class="fa fa-envelope"></i>support@feanefoods.com </a>
+            </div>
+          </div>
+        </div>
+        <div class="col-md-4 footer-col">
+          <div class="footer_detail">
+            <a href="#" class="footer-logo">Feane</a>
+            <p>Crave it. Bite it. Repeat it. Only at Feane</p>
+            <div class="footer_social">
+              <a href="#"><i class="fa fa-facebook"></i></a>
+              <a href="#"><i class="fa fa-twitter"></i></a>
+              <a href="#"><i class="fa fa-linkedin"></i></a>
+              <a href="#"><i class="fa fa-instagram"></i></a>
+              <a href="#"><i class="fa fa-pinterest"></i></a>
+            </div>
+          </div>
+        </div>
+        <div class="col-md-4 footer-col">
+          <h4>Opening Hours</h4>
+          <p>Everyday</p>
+          <p>10.00 AM - 10.00 PM</p>
+        </div>
+      </div>
+      <div class="footer-info">
+        <p>&copy; <span id="displayYear"></span> Feane Express. All rights reserved.
+          <a href="https://html.design/"></a><br><br>
+          Distributed By <a href="https://themewagon.com/" target="_blank"> Feane Technologies</a>
+        </p>
+      </div>
+    </div>
+  </footer>
+  <!-- End Footer -->
+
+  <!-- Scripts -->
+  <script src="{% static 'js/jquery-3.4.1.min.js' %}"></script>
+  <script src="https://cdn.jsdelivr.net/npm/popper.js@1.16.0/dist/umd/popper.min.js"></script>
+  <script src="{% static 'js/bootstrap.js' %}"></script>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/OwlCarousel2/2.3.4/owl.carousel.min.js"></script>
+  <script src="https://unpkg.com/isotope-layout@3.0.4/dist/isotope.pkgd.min.js"></script>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/jquery-nice-select/1.1.0/js/jquery.nice-select.min.js"></script>
+  <script src="{% static 'js/custom.js' %}"></script>
+  <script src="https://maps.googleapis.com/maps/api/js?key=AIzaSyCh39n5U-4IoWpsVGUHWdqB6puEkhRLdmI&callback=myMap"></script>
+
+  <!-- Update Cart Count on Page Load -->
+  <script>
+    function updateCartCount() {
+      fetch('/get-cart-count/', {
+        method: 'GET',
+        headers: {
+          'Content-Type': 'application/json',
+        }
+      })
+      .then(response => response.json())
+      .then(data => {
+        const cartCountElement = document.getElementById('cart-count');
+        if (cartCountElement) {
+          cartCountElement.textContent = data.cart_count || 0;
+          // Hide count badge if 0
+          if (data.cart_count === 0) {
+            cartCountElement.style.display = 'none';
+          } else {
+            cartCountElement.style.display = 'flex';
+          }
+        }
+      })
+      .catch(error => console.error('Error:', error));
+    }
+
+    // Update cart count on page load
+    window.addEventListener('load', updateCartCount);
+
+    // Optional: Update cart count every 5 seconds
+    setInterval(updateCartCount, 5000);
+  </script>
+</body>
+</html>

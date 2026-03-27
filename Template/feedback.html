@@ -1,0 +1,112 @@
+{% extends "base.html" %}
+
+{% load static %}
+{% block class %}class="sub_page"{% endblock class %}
+{% block feedback_status %}active{% endblock feedback_status %}
+{% block main %}
+
+  <!-- start feedback form -->
+  <section class="book_section layout_padding">
+    <div class="container">
+      <div class="heading_container">
+        <h2>
+          Feedback Form
+        </h2>
+      </div>
+      <div class="row">
+        <div class="col-md-6">
+          <div class="form_container">
+            <!-- Display messages here -->
+            {% if messages %}
+              <div class="alert alert-info">
+                {% for message in messages %}
+                  <p>{{ message }}</p>
+                {% endfor %}
+              </div>
+            {% endif %}
+
+            <form action="{% url 'Feedback_Form' %}" method="POST" enctype="multipart/form-data">
+              {% csrf_token %}
+              <div>
+                <input type="text" class="form-control" name="user_name" required placeholder="Your Name" />
+              </div>
+              <div>
+                <input type="email" class="form-control" name="email" required placeholder="Your Email" />
+              </div>
+              <div class="mb-3">
+                <textarea class="form-control" name="description" rows="3" required placeholder="Describe your experience here (min 10 characters)"></textarea>
+              </div>
+              <div>
+                <select class="form-control nice-select wide" required name="rating">
+                  <option value="" disabled selected>
+                    Please Give Us Rating?
+                  </option>
+                  <option value="1">1 - Poor</option>
+                  <option value="2">2 - Fair</option>
+                  <option value="3">3 - Good</option>
+                  <option value="4">4 - Very Good</option>
+                  <option value="5">5 - Excellent</option>
+                </select>
+              </div>
+              <div>
+                <label for="formFileLg" class="form-label">Upload Image (Optional):</label>
+                <input class="form-control form-control-lg" name="image" id="formFileLg" type="file" accept="image/*">
+                <small class="text-muted">Only JPG, PNG, GIF allowed (max 5MB)</small>
+              </div>
+              <div class="btn_box">
+                <button type="submit" class="btn btn-success">
+                  Submit Feedback
+                </button>
+              </div>
+            </form>
+          </div>
+        </div>
+      </div>
+    </div>
+  </section>
+  <!-- end feedback form -->
+
+  <!-- Display existing feedbacks -->
+  <section class="client_section layout_padding-bottom">
+    <div class="container">
+      <div class="heading_container heading_center psudo_white_primary mb_45">
+        <h2>
+          What Says Our Customers
+        </h2>
+      </div>
+      
+      <div class="carousel-wrap row ">
+        <div class="owl-carousel client_owl-carousel">
+          {% for feedback in feedbacks %}
+          <div class="item">
+            <div class="box">
+              <div class="detail-box">
+                <p>
+                  {{feedback.description}}
+                </p>
+                <h6>
+                  {{feedback.user_name}}
+                </h6>
+                <p>
+                  Rating : {{feedback.rating}}/5 ⭐
+                </p>
+              </div>
+              <div class="img-box">
+                {% if feedback.image %}
+                  <img src="/media/{{feedback.image}}" alt="{{feedback.user_name}}" class="box-img">
+                {% else %}
+                  <img src="{% static 'images/default-user.png' %}" alt="Default" class="box-img">
+                {% endif %}
+              </div>
+            </div>
+          </div>
+          {% empty %}
+          <p style="text-align: center; color: #999;">No reviews yet. Be the first!</p>
+          {% endfor %}
+        </div>
+      </div>
+      
+    </div>
+  </section>
+
+{% endblock main %}

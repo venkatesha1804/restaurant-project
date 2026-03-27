@@ -1,0 +1,12 @@
+ERROR 2026-03-21 11:38:39,453 views 17740 14352 Error in HomeView: no such column: Base_App_feedback.is_approved
+ERROR 2026-03-21 11:38:50,066 views 17740 14352 Error in AboutView: no such column: Base_App_aboutus.phone
+ERROR 2026-03-21 11:38:55,244 views 17740 14352 Error in MenuView: no such column: Base_App_items.is_available
+ERROR 2026-03-21 11:48:53,835 views 2560 36336 Error in HomeView: no such column: Base_App_feedback.is_approved
+ERROR 2026-03-21 11:49:00,761 views 2560 36336 Error in MenuView: no such column: Base_App_items.is_available
+ERROR 2026-03-21 11:49:02,610 views 2560 36336 Error in MenuView: no such column: Base_App_items.is_available
+ERROR 2026-03-21 11:49:04,504 views 2560 36336 Error in MenuView: no such column: Base_App_items.is_available
+ERROR 2026-03-21 11:49:08,290 views 2560 36336 Error in AboutView: no such column: Base_App_aboutus.phone
+ERROR 2026-03-21 11:59:25,516 views 33396 48480 Error in AboutView: 'AboutUs' object is not iterable
+ERROR 2026-03-21 18:46:30,985 views 39696 50160 Error in AboutView: 'AboutUs' object is not iterable
+ERROR 2026-03-22 09:05:47,132 views 19848 35632 Error in AboutView: 'AboutUs' object is not iterable
+ERROR 2026-03-22 09:06:49,382 views 36028 26636 Error in AboutView: 'AboutUs' object is not iterable

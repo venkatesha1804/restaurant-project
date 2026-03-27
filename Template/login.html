@@ -1,0 +1,314 @@
+{% extends "base.html" %}
+
+{% load static %}
+{% block class %}class="sub_page"{% endblock class %}
+{% block main %}
+
+  <!-- Login/Signup Section -->
+  <section class="book_section layout_padding">
+    <div class="container">
+      <div class="heading_container">
+        <h2>
+          🔐 Account
+        </h2>
+      </div>
+
+      {% if messages %}
+        <div class="alert alert-info alert-dismissible fade show" role="alert">
+          {% for message in messages %}
+            <div style="margin-bottom: 10px;">{{ message }}</div>
+          {% endfor %}
+          <button type="button" class="close" data-dismiss="alert" aria-label="Close">
+            <span>&times;</span>
+          </button>
+        </div>
+      {% endif %}
+
+      <div class="row">
+        <!-- Login Form -->
+        <div class="col-md-6" id="login-section">
+          <div class="form_container">
+            <h4 style="margin-bottom: 5px; font-weight: bold;">Welcome Back</h4>
+            <p style="color: #999; margin-bottom: 25px;">Login to your account</p>
+
+            <form method="POST" action="{% url 'login' %}" id="login-form">
+              {% csrf_token %}
+
+              <!-- Username/Email -->
+              <div>
+                <label style="font-weight: 600; display: block; margin-bottom: 8px;">👤 Username or Email</label>
+                <input type="text" name="username" class="form-control" required placeholder="Enter your username or email" />
+              </div>
+
+              <!-- Password -->
+              <div style="margin-top: 15px;">
+                <label style="font-weight: 600; display: block; margin-bottom: 8px;">🔒 Password</label>
+                <div style="position: relative;">
+                  <input type="password" name="password" id="login-password" class="form-control" required placeholder="Enter your password" />
+                  <button type="button" class="toggle-password" data-target="login-password" style="
+                    position: absolute;
+                    right: 15px;
+                    top: 50%;
+                    transform: translateY(-50%);
+                    background: none;
+                    border: none;
+                    cursor: pointer;
+                    font-size: 18px;
+                  ">👁️</button>
+                </div>
+              </div>
+
+              <!-- Remember Me -->
+              <div style="margin-top: 15px; margin-bottom: 25px;">
+                <label style="display: flex; align-items: center; cursor: pointer;">
+                  <input type="checkbox" name="remember_me" style="margin-right: 10px; cursor: pointer;">
+                  <span style="font-size: 14px; color: #666;">Remember me</span>
+                </label>
+              </div>
+
+              <!-- Login Button -->
+              <button type="submit" class="btn btn-success" style="width: 100%; padding: 12px; font-size: 16px; font-weight: 600;">
+                🔐 Login to Feane
+              </button>
+
+              <!-- Forgot Password -->
+              <p style="text-align: center; margin-top: 15px; font-size: 14px;">
+                <a href="#" style="color: #ffbe33; text-decoration: none;">Forgot Password?</a>
+              </p>
+            </form>
+
+            <!-- Switch to Signup -->
+            <div style="text-align: center; margin-top: 30px; padding-top: 25px; border-top: 1px solid #eee;">
+              <p style="color: #666; margin-bottom: 10px;">Don't have an account?</p>
+              <button type="button" onclick="switchToSignup()" class="btn btn-outline-secondary" style="width: 100%;">
+                📝 Create New Account
+              </button>
+            </div>
+          </div>
+        </div>
+
+        <!-- Signup Form -->
+        <div class="col-md-6" id="signup-section" style="display: none;">
+          <div class="form_container">
+            <h4 style="margin-bottom: 5px; font-weight: bold;">Create Account</h4>
+            <p style="color: #999; margin-bottom: 25px;">Join us for delicious food</p>
+
+            <form method="POST" action="{% url 'signup' %}" id="signup-form">
+              {% csrf_token %}
+
+              <!-- Full Name -->
+              <div>
+                <label style="font-weight: 600; display: block; margin-bottom: 8px;">👤 Full Name</label>
+                <input type="text" name="full_name" class="form-control" required placeholder="Enter your full name" />
+              </div>
+
+              <!-- Email -->
+              <div style="margin-top: 15px;">
+                <label style="font-weight: 600; display: block; margin-bottom: 8px;">📧 Email Address</label>
+                <input type="email" name="email" class="form-control" required placeholder="Enter your email" />
+              </div>
+
+              <!-- Username -->
+              <div style="margin-top: 15px;">
+                <label style="font-weight: 600; display: block; margin-bottom: 8px;">👤 Username</label>
+                <input type="text" name="username" class="form-control" required placeholder="Choose a username" />
+              </div>
+
+              <!-- Password -->
+              <div style="margin-top: 15px;">
+                <label style="font-weight: 600; display: block; margin-bottom: 8px;">🔒 Password</label>
+                <div style="position: relative;">
+                  <input type="password" name="password" id="signup-password" class="form-control" required placeholder="Create a password" oninput="checkPasswordStrength(this.value)" />
+                  <button type="button" class="toggle-password" data-target="signup-password" style="
+                    position: absolute;
+                    right: 15px;
+                    top: 50%;
+                    transform: translateY(-50%);
+                    background: none;
+                    border: none;
+                    cursor: pointer;
+                    font-size: 18px;
+                  ">👁️</button>
+                </div>
+                <!-- Password Strength Indicator -->
+                <div id="password-strength" style="margin-top: 8px; display: none;">
+                  <div style="display: flex; gap: 5px; margin-bottom: 5px;">
+                    <div class="strength-bar" style="flex: 1; height: 4px; background-color: #ddd; border-radius: 2px;"></div>
+                    <div class="strength-bar" style="flex: 1; height: 4px; background-color: #ddd; border-radius: 2px;"></div>
+                    <div class="strength-bar" style="flex: 1; height: 4px; background-color: #ddd; border-radius: 2px;"></div>
+                  </div>
+                  <p id="strength-text" style="margin: 0; font-size: 12px; color: #999;">Password strength</p>
+                </div>
+              </div>
+
+              <!-- Confirm Password -->
+              <div style="margin-top: 15px;">
+                <label style="font-weight: 600; display: block; margin-bottom: 8px;">🔒 Confirm Password</label>
+                <input type="password" name="confirm_password" class="form-control" required placeholder="Confirm your password" />
+              </div>
+
+              <!-- Terms -->
+              <div style="margin-top: 15px; margin-bottom: 25px;">
+                <label style="display: flex; align-items: flex-start; cursor: pointer;">
+                  <input type="checkbox" name="agree_terms" required style="margin-right: 10px; margin-top: 3px; cursor: pointer;">
+                  <span style="font-size: 13px; color: #666;">
+                    I agree to the <a href="#" style="color: #ffbe33; text-decoration: none;">Terms & Conditions</a>
+                  </span>
+                </label>
+              </div>
+
+              <!-- Signup Button -->
+              <button type="submit" class="btn btn-success" style="width: 100%; padding: 12px; font-size: 16px; font-weight: 600;">
+                📝 Create Account
+              </button>
+            </form>
+
+            <!-- Switch to Login -->
+            <div style="text-align: center; margin-top: 30px; padding-top: 25px; border-top: 1px solid #eee;">
+              <p style="color: #666; margin-bottom: 10px;">Already have an account?</p>
+              <button type="button" onclick="switchToLogin()" class="btn btn-outline-secondary" style="width: 100%;">
+                🔐 Login Instead
+              </button>
+            </div>
+          </div>
+        </div>
+
+        <!-- Right Side Info -->
+        <div class="col-md-6" style="display: flex; flex-direction: column; justify-content: center;">
+          <div style="padding: 20px;">
+            <h4 style="margin-bottom: 20px; font-weight: bold;">🍕 Why Create an Account?</h4>
+            
+            <div style="margin-bottom: 20px;">
+              <p style="margin: 0; font-weight: 600; color: #333;">✅ Quick Checkout</p>
+              <p style="margin: 5px 0 0 0; color: #999; font-size: 14px;">Save your details for faster ordering</p>
+            </div>
+
+            <div style="margin-bottom: 20px;">
+              <p style="margin: 0; font-weight: 600; color: #333;">📦 Track Orders</p>
+              <p style="margin: 5px 0 0 0; color: #999; font-size: 14px;">Monitor your delivery in real-time</p>
+            </div>
+
+            <div style="margin-bottom: 20px;">
+              <p style="margin: 0; font-weight: 600; color: #333;">💰 Exclusive Deals</p>
+              <p style="margin: 5px 0 0 0; color: #999; font-size: 14px;">Get special offers and discounts</p>
+            </div>
+
+            <div style="margin-bottom: 20px;">
+              <p style="margin: 0; font-weight: 600; color: #333;">❤️ Favorites</p>
+              <p style="margin: 5px 0 0 0; color: #999; font-size: 14px;">Save your favorite meals</p>
+            </div>
+
+            <div style="margin-bottom: 20px;">
+              <p style="margin: 0; font-weight: 600; color: #333;">⭐ Order History</p>
+              <p style="margin: 5px 0 0 0; color: #999; font-size: 14px;">Reorder your favorite items easily</p>
+            </div>
+
+            <!-- Info Box -->
+            <div style="background-color: #f0f7ff; padding: 20px; border-radius: 10px; margin-top: 30px; border-left: 4px solid #667eea;">
+              <p style="margin: 0; font-size: 14px; color: #0066cc;">
+                <strong>🔒 Your data is secure</strong><br>
+                We use industry-leading encryption to protect your information.
+              </p>
+            </div>
+          </div>
+        </div>
+      </div>
+
+    </div>
+  </section>
+
+  <script>
+    // Tab switching functions
+    function switchToSignup() {
+      document.getElementById('login-section').style.display = 'none';
+      document.getElementById('signup-section').style.display = 'block';
+      window.scrollTo(0, 0);
+    }
+
+    function switchToLogin() {
+      document.getElementById('login-section').style.display = 'block';
+      document.getElementById('signup-section').style.display = 'none';
+      window.scrollTo(0, 0);
+    }
+
+    // Password visibility toggle
+    document.querySelectorAll('.toggle-password').forEach(btn => {
+      btn.addEventListener('click', function() {
+        const target = document.getElementById(this.getAttribute('data-target'));
+        if (target.type === 'password') {
+          target.type = 'text';
+          this.textContent = '🙈';
+        } else {
+          target.type = 'password';
+          this.textContent = '👁️';
+        }
+      });
+    });
+
+    // Password strength checker
+    function checkPasswordStrength(password) {
+      const strengthDiv = document.getElementById('password-strength');
+      const bars = document.querySelectorAll('.strength-bar');
+      const strengthText = document.getElementById('strength-text');
+      
+      strengthDiv.style.display = 'block';
+      
+      let strength = 0;
+      
+      // Check length
+      if (password.length >= 8) strength++;
+      if (password.length >= 12) strength++;
+      
+      // Check complexity
+      if (/[A-Z]/.test(password)) strength++;
+      if (/[0-9]/.test(password)) strength++;
+      if (/[^A-Za-z0-9]/.test(password)) strength++;
+      
+      // Update bars
+      bars.forEach((bar, index) => {
+        if (index < strength) {
+          if (strength <= 2) {
+            bar.style.backgroundColor = '#ff6b6b';
+          } else if (strength <= 3) {
+            bar.style.backgroundColor = '#ffa500';
+          } else {
+            bar.style.backgroundColor = '#51cf66';
+          }
+        } else {
+          bar.style.backgroundColor = '#ddd';
+        }
+      });
+      
+      // Update text
+      if (strength <= 2) {
+        strengthText.textContent = '❌ Weak password';
+        strengthText.style.color = '#ff6b6b';
+      } else if (strength <= 3) {
+        strengthText.textContent = '⚠️ Medium strength';
+        strengthText.style.color = '#ffa500';
+      } else {
+        strengthText.textContent = '✓ Strong password';
+        strengthText.style.color = '#51cf66';
+      }
+    }
+
+    // Form validation
+    document.getElementById('signup-form')?.addEventListener('submit', function(e) {
+      const password = document.querySelector('input[name="password"]').value;
+      const confirm = document.querySelector('input[name="confirm_password"]').value;
+      
+      if (password !== confirm) {
+        e.preventDefault();
+        alert('❌ Passwords do not match!');
+        return false;
+      }
+      
+      if (password.length < 6) {
+        e.preventDefault();
+        alert('❌ Password must be at least 6 characters long');
+        return false;
+      }
+    });
+  </script>
+
+{% endblock main %}

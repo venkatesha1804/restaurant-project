@@ -1,0 +1,329 @@
+{% extends "base.html" %}
+
+{% load static %}
+{% block class %}class="sub_page"{% endblock class %}
+{% block main %}
+
+  <!-- Admin Order Detail Section -->
+  <section class="book_section layout_padding">
+    <div class="container">
+      
+      <!-- Header -->
+      <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 30px;">
+        <div>
+          <h2 style="margin: 0;">📦 Order #{{ order.id }}</h2>
+          <p style="margin: 5px 0 0 0; color: #999;">{{ order.created_at|date:"M d, Y at H:i" }}</p>
+        </div>
+        <a href="{% url 'admin_orders' %}" class="btn btn-outline-secondary">← Back to Orders</a>
+      </div>
+
+      <div class="row">
+        <!-- Main Content -->
+        <div class="col-md-8">
+          
+          <!-- Order Status Management -->
+          <div class="card" style="border: 1px solid #ddd; border-radius: 10px; padding: 25px; margin-bottom: 20px;">
+            <h4 style="margin-bottom: 20px; font-weight: bold;">📍 Update Order Status</h4>
+            
+            <form id="status-form" style="display: flex; gap: 10px; margin-bottom: 20px;">
+              {% csrf_token %}
+              <select id="status-select" name="status" class="form-control" style="flex: 1;">
+                <option value="pending" {% if order.status == 'pending' %}selected{% endif %}>⏳ Pending</option>
+                <option value="confirmed" {% if order.status == 'confirmed' %}selected{% endif %}>✓ Confirmed</option>
+                <option value="preparing" {% if order.status == 'preparing' %}selected{% endif %}>🍳 Preparing</option>
+                <option value="ready" {% if order.status == 'ready' %}selected{% endif %}>✓ Ready</option>
+                <option value="delivered" {% if order.status == 'delivered' %}selected{% endif %}>✓ Delivered</option>
+                <option value="cancelled" {% if order.status == 'cancelled' %}selected{% endif %}>✗ Cancelled</option>
+              </select>
+              <button type="submit" class="btn btn-primary" style="padding: 10px 20px;">Update Status</button>
+            </form>
+
+            <!-- Status Timeline -->
+            <div style="background-color: #f9f9f9; padding: 20px; border-radius: 5px;">
+              {% for status, label in statuses %}
+              <div style="display: flex; margin-bottom: 15px; align-items: center;">
+                <div style="
+                  width: 35px;
+                  height: 35px;
+                  background-color: 
+                    {% if status == 'pending' and order.status in 'pending,confirmed,preparing,ready,delivered' %}#28a745
+                    {% elif status == 'confirmed' and order.status in 'confirmed,preparing,ready,delivered' %}#28a745
+                    {% elif status == 'preparing' and order.status in 'preparing,ready,delivered' %}#28a745
+                    {% elif status == 'ready' and order.status in 'ready,delivered' %}#28a745
+                    {% elif status == 'delivered' and order.status == 'delivered' %}#28a745
+                    {% else %}#e0e0e0
+                    {% endif %};
+                  border-radius: 50%;
+                  display: flex;
+                  align-items: center;
+                  justify-content: center;
+                  color: white;
+                  font-weight: bold;
+                  margin-right: 15px;
+                  flex-shrink: 0;
+                ">
+                  ✓
+                </div>
+                <div>
+                  <p style="margin: 0; font-weight: 600;">{{ label }}</p>
+                </div>
+              </div>
+              {% endfor %}
+            </div>
+          </div>
+
+          <!-- Customer Information -->
+          <div class="card" style="border: 1px solid #ddd; border-radius: 10px; padding: 25px; margin-bottom: 20px;">
+            <h4 style="margin-bottom: 20px; font-weight: bold;">👤 Customer Information</h4>
+            
+            <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 20px;">
+              <div>
+                <p style="margin: 0; font-size: 12px; color: #999; font-weight: 600;">FULL NAME</p>
+                <p style="margin: 5px 0 0 0; font-size: 16px; font-weight: bold;">{{ order.customer_name }}</p>
+              </div>
+              <div>
+                <p style="margin: 0; font-size: 12px; color: #999; font-weight: 600;">EMAIL</p>
+                <p style="margin: 5px 0 0 0; font-size: 16px;">{{ order.customer_email }}</p>
+              </div>
+              <div>
+                <p style="margin: 0; font-size: 12px; color: #999; font-weight: 600;">PHONE</p>
+                <p style="margin: 5px 0 0 0; font-size: 16px;">{{ order.customer_phone }}</p>
+              </div>
+              <div>
+                <p style="margin: 0; font-size: 12px; color: #999; font-weight: 600;">DELIVERY TYPE</p>
+                <p style="margin: 5px 0 0 0; font-size: 16px;">
+                  {% if order.delivery_type == 'delivery' %}🚗 Home Delivery{% else %}🏪 Pickup{% endif %}
+                </p>
+              </div>
+            </div>
+          </div>
+
+          <!-- Delivery Address -->
+          <div class="card" style="border: 1px solid #ddd; border-radius: 10px; padding: 25px; margin-bottom: 20px;">
+            <h4 style="margin-bottom: 20px; font-weight: bold;">📍 Delivery Address</h4>
+            
+            <div style="background-color: #f9f9f9; padding: 15px; border-radius: 5px;">
+              <p style="margin: 0; line-height: 1.8; font-size: 15px;">
+                {{ order.delivery_address }}<br>
+                <strong>{{ order.delivery_city }} - {{ order.delivery_pincode }}</strong>
+              </p>
+            </div>
+          </div>
+
+          <!-- Order Items -->
+          <div class="card" style="border: 1px solid #ddd; border-radius: 10px; padding: 25px; margin-bottom: 20px;">
+            <h4 style="margin-bottom: 20px; font-weight: bold;">🍕 Order Items ({{ order_items|length }} items)</h4>
+            
+            <div style="overflow-x: auto;">
+              <table style="width: 100%; border-collapse: collapse;">
+                <thead style="border-bottom: 2px solid #ddd;">
+                  <tr>
+                    <th style="text-align: left; padding: 10px;">Item</th>
+                    <th style="text-align: center; padding: 10px;">Qty</th>
+                    <th style="text-align: right; padding: 10px;">Price</th>
+                    <th style="text-align: right; padding: 10px;">Subtotal</th>
+                  </tr>
+                </thead>
+                <tbody>
+                  {% for item in order_items %}
+                  <tr style="border-bottom: 1px solid #eee;">
+                    <td style="padding: 15px;">
+                      <div style="display: flex; gap: 10px;">
+                        <img src="/media/{{ item.item.image }}" alt="{{ item.item.item_name }}" 
+                             style="width: 60px; height: 60px; object-fit: cover; border-radius: 5px;">
+                        <div>
+                          <p style="margin: 0; font-weight: 600;">{{ item.item.item_name }}</p>
+                          <p style="margin: 3px 0 0 0; font-size: 12px; color: #999;">{{ item.item.description|truncatewords:5 }}</p>
+                        </div>
+                      </div>
+                    </td>
+                    <td style="text-align: center; padding: 15px;">
+                      <strong>{{ item.quantity }}</strong>
+                    </td>
+                    <td style="text-align: right; padding: 15px;">
+                      <strong>${{ item.price_at_purchase }}</strong>
+                    </td>
+                    <td style="text-align: right; padding: 15px;">
+                      <strong style="color: #ffbe33;">${{ item.subtotal }}</strong>
+                    </td>
+                  </tr>
+                  {% endfor %}
+                </tbody>
+              </table>
+            </div>
+          </div>
+
+          <!-- Special Requests -->
+          {% if order.special_requests %}
+          <div class="card" style="border: 1px solid #ddd; border-radius: 10px; padding: 25px; background-color: #fffbea;">
+            <h4 style="margin-bottom: 15px; font-weight: bold;">📝 Special Requests</h4>
+            <p style="margin: 0; color: #666; line-height: 1.6;">{{ order.special_requests }}</p>
+          </div>
+          {% endif %}
+
+        </div>
+
+        <!-- Sidebar -->
+        <div class="col-md-4">
+          
+          <!-- Order Summary -->
+          <div class="card" style="border: 1px solid #ddd; border-radius: 10px; padding: 20px; margin-bottom: 20px; position: sticky; top: 20px;">
+            <h4 style="margin-bottom: 20px; font-weight: bold;">💰 Order Summary</h4>
+            
+            <div style="background-color: #f0f7ff; padding: 12px; border-radius: 5px; margin-bottom: 20px; text-align: center;">
+              <p style="margin: 0; color: #0066cc; font-size: 12px; font-weight: 600;">ORDER NUMBER</p>
+              <h3 style="margin: 5px 0 0 0; color: #0066cc; font-family: monospace;">{{ order.id }}</h3>
+            </div>
+
+            <div style="margin-bottom: 15px; padding-bottom: 10px; border-bottom: 1px solid #eee;">
+              <div style="display: flex; justify-content: space-between; margin-bottom: 8px;">
+                <span>Subtotal:</span>
+                <strong>${{ order.total_amount }}</strong>
+              </div>
+              <div style="display: flex; justify-content: space-between; margin-bottom: 8px;">
+                <span>Delivery:</span>
+                <strong style="color: #28a745;">FREE</strong>
+              </div>
+              <div style="display: flex; justify-content: space-between;">
+                <span>Tax:</span>
+                <strong>$0.00</strong>
+              </div>
+            </div>
+
+            <div style="display: flex; justify-content: space-between; font-size: 18px; margin-bottom: 20px;">
+              <span style="font-weight: bold;">Total:</span>
+              <strong style="color: #ffbe33; font-size: 20px;">${{ order.total_amount }}</strong>
+            </div>
+
+            <!-- Order Status Badge -->
+            <div style="
+              background-color: 
+                {% if order.status == 'pending' %}#fff3cd
+                {% elif order.status == 'confirmed' %}#cfe2ff
+                {% elif order.status == 'preparing' %}#cff4fc
+                {% elif order.status == 'ready' %}#d1e7dd
+                {% elif order.status == 'delivered' %}#d1e7dd
+                {% else %}#f8d7da
+                {% endif %};
+              padding: 12px;
+              border-radius: 5px;
+              margin-bottom: 15px;
+              border-left: 4px solid
+                {% if order.status == 'pending' %}#ffc107
+                {% elif order.status == 'confirmed' %}#0d6efd
+                {% elif order.status == 'preparing' %}#0dcaf0
+                {% elif order.status == 'ready' %}#198754
+                {% elif order.status == 'delivered' %}#198754
+                {% else %}#dc3545
+                {% endif %};
+            ">
+              <p style="margin: 0; font-size: 12px; font-weight: 600;">CURRENT STATUS</p>
+              <p style="margin: 5px 0 0 0; font-size: 14px; font-weight: bold;">
+                {% if order.status == 'pending' %}⏳ Pending
+                {% elif order.status == 'confirmed' %}✓ Confirmed
+                {% elif order.status == 'preparing' %}🍳 Preparing
+                {% elif order.status == 'ready' %}✓ Ready
+                {% elif order.status == 'delivered' %}✓ Delivered
+                {% else %}✗ Cancelled
+                {% endif %}
+              </p>
+            </div>
+
+            <!-- Payment Status -->
+            <div style="
+              background-color: 
+                {% if order.payment_status == 'completed' %}#d1e7dd
+                {% elif order.payment_status == 'pending' %}#fff3cd
+                {% else %}#f8d7da
+                {% endif %};
+              padding: 12px;
+              border-radius: 5px;
+              border-left: 4px solid
+                {% if order.payment_status == 'completed' %}#198754
+                {% elif order.payment_status == 'pending' %}#ffc107
+                {% else %}#dc3545
+                {% endif %};
+            ">
+              <p style="margin: 0; font-size: 12px; font-weight: 600;">PAYMENT STATUS</p>
+              <p style="margin: 5px 0 0 0; font-size: 14px; font-weight: bold;">
+                {% if order.payment_status == 'completed' %}✓ Paid
+                {% elif order.payment_status == 'pending' %}⏳ Pending
+                {% else %}✗ Failed
+                {% endif %}
+              </p>
+            </div>
+          </div>
+
+          <!-- Order Metadata -->
+          <div class="card" style="border: 1px solid #ddd; border-radius: 10px; padding: 20px;">
+            <h4 style="margin-bottom: 15px; font-weight: bold;">📊 Order Details</h4>
+            
+            <div style="background-color: #f9f9f9; padding: 12px; border-radius: 5px;">
+              <p style="margin: 8px 0; font-size: 13px;">
+                <strong>Order Date:</strong><br>
+                {{ order.created_at|date:"M d, Y H:i:s" }}
+              </p>
+              <p style="margin: 8px 0; font-size: 13px;">
+                <strong>Last Updated:</strong><br>
+                {{ order.updated_at|date:"M d, Y H:i:s" }}
+              </p>
+              <p style="margin: 8px 0; font-size: 13px;">
+                <strong>Total Items:</strong><br>
+                {{ total_items }} items
+              </p>
+              <p style="margin: 8px 0; font-size: 13px;">
+                <strong>Average Item Price:</strong><br>
+                ${{ order.total_amount|add:0|floatformat:2 }}
+              </p>
+            </div>
+          </div>
+
+        </div>
+      </div>
+
+    </div>
+  </section>
+
+  <!-- Update Status Script -->
+  <script>
+    document.getElementById('status-form').addEventListener('submit', function(e) {
+      e.preventDefault();
+      
+      const orderId = {{ order.id }};
+      const newStatus = document.getElementById('status-select').value;
+      const btn = this.querySelector('button[type="submit"]');
+      
+      // Show loading
+      btn.disabled = true;
+      const originalText = btn.textContent;
+      btn.textContent = '⏳ Updating...';
+
+      fetch(`/admin/order/${orderId}/update-status/`, {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/x-www-form-urlencoded',
+          'X-CSRFTOKEN': '{{ csrf_token }}'
+        },
+        body: `status=${newStatus}`
+      })
+      .then(response => response.json())
+      .then(data => {
+        if (data.success) {
+          alert(`✓ ${data.message}`);
+          location.reload();
+        } else {
+          alert(`✗ ${data.message}`);
+          btn.disabled = false;
+          btn.textContent = originalText;
+        }
+      })
+      .catch(error => {
+        console.error('Error:', error);
+        alert('Error updating order status');
+        btn.disabled = false;
+        btn.textContent = originalText;
+      });
+    });
+  </script>
+
+{% endblock main %}
