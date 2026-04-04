@@ -2416,3 +2416,17 @@ INFO 2026-04-04 10:09:33,341 basehttp "GET /get-cart-count/ HTTP/1.1" 200 39
 INFO 2026-04-04 10:17:33,914 basehttp "GET /get-cart-count/ HTTP/1.1" 200 39
 INFO 2026-04-04 10:18:33,335 basehttp "GET /get-cart-count/ HTTP/1.1" 200 39
 INFO 2026-04-04 10:19:34,171 basehttp "GET /get-cart-count/ HTTP/1.1" 200 39
+INFO 2026-04-04 11:01:16,371 autoreload Watching for file changes with StatReloader
+INFO 2026-04-04 11:01:20,145 basehttp "GET / HTTP/1.1" 200 18800
+INFO 2026-04-04 11:01:21,517 basehttp "GET /get-cart-count/ HTTP/1.1" 200 39
+INFO 2026-04-04 11:01:22,298 basehttp "GET /menu/ HTTP/1.1" 200 28560
+INFO 2026-04-04 11:01:23,445 basehttp "GET /get-cart-count/ HTTP/1.1" 200 39
+INFO 2026-04-04 11:01:27,525 basehttp "GET /book-table/ HTTP/1.1" 200 10198
+INFO 2026-04-04 11:01:28,190 basehttp "GET /get-cart-count/ HTTP/1.1" 200 39
+INFO 2026-04-04 11:01:29,983 basehttp "GET /cart/ HTTP/1.1" 200 17081
+INFO 2026-04-04 11:01:30,201 basehttp "GET /get-cart-count/ HTTP/1.1" 200 39
+INFO 2026-04-04 11:01:35,092 basehttp "GET /get-cart-count/ HTTP/1.1" 200 39
+INFO 2026-04-04 11:01:40,337 basehttp "GET /get-cart-count/ HTTP/1.1" 200 39
+INFO 2026-04-04 11:01:45,338 basehttp "GET /get-cart-count/ HTTP/1.1" 200 39
+INFO 2026-04-04 11:01:50,335 basehttp "GET /get-cart-count/ HTTP/1.1" 200 39
+INFO 2026-04-04 11:01:55,341 basehttp "GET /get-cart-count/ HTTP/1.1" 200 39
