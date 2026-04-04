@@ -33,7 +33,7 @@
             <div class="card bg-warning text-white">
                 <div class="card-body">
                     <h5 class="card-title">Bookings</h5>
-                    <h2>{{ total_bookings }}</h2>
+                    <h2>{{ pending_bookings|add:confirmed_bookings|add:completed_bookings }}</h2>
                 </div>
             </div>
         </div>
@@ -41,7 +41,7 @@
             <div class="card bg-info text-white">
                 <div class="card-body">
                     <h5 class="card-title">Feedbacks</h5>
-                    <h2>{{ total_feedbacks }}</h2>
+                    <h2>{{ approved_feedbacks|length }} / Pending: {{ pending_feedbacks }}</h2>
                 </div>
             </div>
         </div>
@@ -55,16 +55,6 @@
                     <h3>Menu Management</h3>
                 </div>
                 <div class="card-body">
-                    <div class="row mb-3">
-                        <div class="col-md-6">
-                            <a href="/admin/Base_App/items/add/" class="btn btn-success">Add New Item</a>
-                            <a href="/admin/Base_App/itemlist/add/" class="btn btn-primary">Add New Category</a>
-                        </div>
-                        <div class="col-md-6 text-right">
-                            <a href="/admin/" class="btn btn-secondary">Go to Django Admin</a>
-                        </div>
-                    </div>
-
                     <!-- Items Table -->
                     <h4>Current Menu Items</h4>
                     <div class="table-responsive">
@@ -76,27 +66,22 @@
                                     <th>Category</th>
                                     <th>Description</th>
                                     <th>Price</th>
-                                    <th>Actions</th>
                                 </tr>
                             </thead>
                             <tbody>
                                 {% for item in items %}
                                 <tr>
                                     <td>
-                                        {% if item.Image %}
-                                            <img src="{{ item.Image.url }}" alt="{{ item.Item_name }}" style="width: 50px; height: 50px; object-fit: cover;">
+                                        {% if item.image %}
+                                            <img src="{{ item.image.url }}" alt="{{ item.item_name }}" style="width: 50px; height: 50px; object-fit: cover;">
                                         {% else %}
                                             No Image
                                         {% endif %}
                                     </td>
-                                    <td>{{ item.Item_name }}</td>
-                                    <td>{{ item.Category.Category_name }}</td>
+                                    <td>{{ item.item_name }}</td>
+                                    <td>{{ item.category.category_name }}</td>
                                     <td>{{ item.description|truncatechars:50 }}</td>
-                                    <td>${{ item.Price }}</td>
-                                    <td>
-                                        <a href="/admin/Base_App/items/{{ item.id }}/change/" class="btn btn-sm btn-warning">Edit</a>
-                                        <a href="/admin/Base_App/items/{{ item.id }}/delete/" class="btn btn-sm btn-danger">Delete</a>
-                                    </td>
+                                    <td>₹{{ item.price }}</td>
                                 </tr>
                                 {% endfor %}
                             </tbody>
@@ -111,18 +96,13 @@
                                 <tr>
                                     <th>Category Name</th>
                                     <th>Items Count</th>
-                                    <th>Actions</th>
                                 </tr>
                             </thead>
                             <tbody>
                                 {% for category in categories %}
                                 <tr>
-                                    <td>{{ category.Category_name }}</td>
-                                    <td>{{ category.Name.count }}</td>
-                                    <td>
-                                        <a href="/admin/Base_App/itemlist/{{ category.id }}/change/" class="btn btn-sm btn-warning">Edit</a>
-                                        <a href="/admin/Base_App/itemlist/{{ category.id }}/delete/" class="btn btn-sm btn-danger">Delete</a>
-                                    </td>
+                                    <td>{{ category.category_name }}</td>
+                                    <td>{{ category.get_active_items_count }}</td>
                                 </tr>
                                 {% endfor %}
                             </tbody>
@@ -153,13 +133,13 @@
                                 </tr>
                             </thead>
                             <tbody>
-                                {% for booking in bookings|slice:":10" %}
+                                {% for booking in recent_bookings %}
                                 <tr>
-                                    <td>{{ booking.Name }}</td>
-                                    <td>{{ booking.Phone_number }}</td>
-                                    <td>{{ booking.Email }}</td>
-                                    <td>{{ booking.Total_person }}</td>
-                                    <td>{{ booking.Booking_date }}</td>
+                                    <td>{{ booking.name }}</td>
+                                    <td>{{ booking.phone_number }}</td>
+                                    <td>{{ booking.email }}</td>
+                                    <td>{{ booking.total_persons }}</td>
+                                    <td>{{ booking.booking_date }}</td>
                                 </tr>
                                 {% endfor %}
                             </tbody>
@@ -169,5 +149,46 @@
             </div>
         </div>
     </div>
+
+    <!-- Feedback Moderation Panel -->
+    <div class="row mt-4">
+        <div class="col-12">
+            <div class="card">
+                <div class="card-header bg-secondary text-white">
+                    <h3>Pending Feedback Moderation</h3>
+                </div>
+                <div class="card-body">
+                    <table class="table table-striped">
+                        <thead>
+                            <tr>
+                                <th>User</th>
+                                <th>Rating</th>
+                                <th>Comment</th>
+                                <th>Actions</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            {% for fb in Feedback.objects.filter(is_approved=False) %}
+                            <tr>
+                                <td>{{ fb.user_name }}</td>
+                                <td>{{ fb.rating }}★</td>
+                                <td>{{ fb.description|truncatechars:80 }}</td>
+                                <td>
+                                    <a href="{% url 'approve_feedback' fb.id %}" class="btn btn-success btn-sm">Approve</a>
+                                    <a href="{% url 'reject_feedback' fb.id %}" class="btn btn-danger btn-sm">Reject</a>
+                                </td>
+                            </tr>
+                            {% empty %}
+                            <tr>
+                                <td colspan="4">No pending feedback</td>
+                            </tr>
+                            {% endfor %}
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+        </div>
+    </div>
+
 </div>
 {% endblock main %}

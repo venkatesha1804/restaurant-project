@@ -1,0 +1,71 @@
+{% extends 'base.html' %}
+
+{% block content %}
+<div class="container mt-5">
+    <div class="row justify-content-center">
+        <div class="col-md-6">
+            <div class="card shadow">
+                <div class="card-header bg-primary text-white">
+                    <h4 class="mb-0">⭐ Rate {{ item.item_name }}</h4>
+                </div>
+                <div class="card-body">
+                    <form method="POST">
+                        {% csrf_token %}
+                        
+                        <div class="mb-3">
+                            <label class="form-label"><strong>Your Name</strong></label>
+                            <input type="text" name="customer_name" class="form-control" placeholder="Enter your name" required>
+                        </div>
+                        
+                        <div class="mb-3">
+                            <label class="form-label"><strong>Your Email</strong></label>
+                            <input type="email" name="customer_email" class="form-control" placeholder="Enter your email" required>
+                        </div>
+                        
+                        <div class="mb-3">
+                            <label class="form-label"><strong>Your Rating</strong></label>
+                            <div class="mb-3">
+                                <label class="form-check form-check-inline">
+                                    <input type="radio" name="rating" value="5" class="form-check-input" required>
+                                    <span class="form-check-label">⭐⭐⭐⭐⭐ Excellent</span>
+                                </label>
+                            </div>
+                            <div class="mb-3">
+                                <label class="form-check form-check-inline">
+                                    <input type="radio" name="rating" value="4" class="form-check-input">
+                                    <span class="form-check-label">⭐⭐⭐⭐ Very Good</span>
+                                </label>
+                            </div>
+                            <div class="mb-3">
+                                <label class="form-check form-check-inline">
+                                    <input type="radio" name="rating" value="3" class="form-check-input">
+                                    <span class="form-check-label">⭐⭐⭐ Good</span>
+                                </label>
+                            </div>
+                            <div class="mb-3">
+                                <label class="form-check form-check-inline">
+                                    <input type="radio" name="rating" value="2" class="form-check-input">
+                                    <span class="form-check-label">⭐⭐ Fair</span>
+                                </label>
+                            </div>
+                            <div class="mb-3">
+                                <label class="form-check form-check-inline">
+                                    <input type="radio" name="rating" value="1" class="form-check-input">
+                                    <span class="form-check-label">⭐ Poor</span>
+                                </label>
+                            </div>
+                        </div>
+                        
+                        <div class="mb-3">
+                            <label class="form-label"><strong>Your Review (Optional)</strong></label>
+                            <textarea name="review" class="form-control" placeholder="Share your experience..." rows="4"></textarea>
+                        </div>
+                        
+                        <button type="submit" class="btn btn-primary btn-lg w-100">Submit Rating</button>
+                    </form>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}

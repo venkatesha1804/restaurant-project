@@ -24,18 +24,19 @@
           </div>
           {% endif %}
 
-          <form action="{% url 'Book_Table' %}" method='POST'>{% csrf_token %}
+          <form action="{% url 'Book_Table' %}" method="POST">
+            {% csrf_token %}
             <div>
-              <input type="text" class="form-control" name="user_name" required placeholder="Your Name" />
+              <input type="text" class="form-control" name="name" required placeholder="Your Name" />
             </div>
             <div>
               <input type="text" class="form-control" name="phone_number" required placeholder="Phone Number" />
             </div>
             <div>
-              <input type="email" class="form-control" name="user_email" placeholder="Your Email" />
+              <input type="email" class="form-control" name="email" required placeholder="Your Email" />
             </div>
             <div>
-              <select class="form-control nice-select wide" required name="total_person">
+              <select class="form-control nice-select wide" required name="total_persons">
                 <option value="" disabled selected>
                   How many persons?
                 </option>
@@ -46,7 +47,10 @@
               </select>
             </div>
             <div>
-              <input type="date" required name="booking_data" class="form-control">
+              <input type="date" required name="booking_date" class="form-control">
+            </div>
+            <div>
+              <input type="time" required name="booking_time" class="form-control">
             </div>
             <div class="btn_box">
               <button>
@@ -57,39 +61,23 @@
         </div>
       </div>
       
-      <!-- Google Map section -->
+      <!-- Bangalore Map section -->
       <div class="col-md-6">
         <div class="map_container">
-          <div id="googleMap" style="height: 400px; width: 100%;"></div> <!-- Ensure the map has a height and width -->
+          <iframe 
+            src="https://www.google.com/maps/embed?pb=!1m18!1m12!1m3!1d3888.835753739602!2d77.594562!3d12.971598!2m3!1f0!2f0!3f0!3m2!1i1024!2i768!4f13.1!3m3!1m2!1s0x3bae1670f3d3e5b1%3A0x6f0f0f0f0f0f0f0f!2sBangalore%2C%20Karnataka!5e0!3m2!1sen!2sin!4v1712040000000!5m2!1sen!2sin" 
+            width="100%" 
+            height="400" 
+            style="border:0;" 
+            allowfullscreen="" 
+            loading="lazy" 
+            referrerpolicy="no-referrer-when-downgrade">
+          </iframe>
         </div>
       </div>
     </div>
   </div>
 </section>
 <!-- end book section -->
-
-<!-- Add the Google Maps API -->
-<script src="https://maps.googleapis.com/maps/api/js?key={{ google_maps_api_key }}&callback=initMap" async defer></script>
-
-<!-- Initialize Google Map -->
-<script>
-function initMap() {
-  // Set the location of your restaurant (replace with your actual coordinates)
-  var restaurantLocation = { lat: 26.8467, lng: 80.9462 }; // Example coordinates (change these)
-
-  // Create the map centered on the restaurant
-  var map = new google.maps.Map(document.getElementById('googleMap'), {
-    zoom: 14,  // Set zoom level
-    center: restaurantLocation  // Set map's center
-  });
-
-  // Add a marker at the restaurant's location
-  var marker = new google.maps.Marker({
-    position: restaurantLocation,
-    map: map,
-    title: 'Your Restaurant Name'  // Change this to your restaurant's name
-  });
-}
-</script>
 
 {% endblock main %}

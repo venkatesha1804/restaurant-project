@@ -1,0 +1,107 @@
+{% extends "base.html" %}
+{% load static %}
+
+{% block title %}Payment - Feane{% endblock %}
+{% block class %}class="sub_page"{% endblock %}
+
+{% block main %}
+
+<section class="book_section layout_padding">
+    <div class="container">
+        <div class="heading_container">
+            <h2>💳 Complete Payment</h2>
+        </div>
+
+        <div class="row justify-content-center">
+            <div class="col-md-8">
+                <div style="background: white; padding: 30px; border-radius: 15px; box-shadow: 0 5px 20px rgba(0,0,0,0.1); border: 2px solid #FFA500;">
+                    
+                    <div style="background: #e3f2fd; padding: 20px; border-radius: 10px; margin-bottom: 25px;">
+                        <h5 style="color: #0066cc; font-weight: bold; margin-bottom: 12px;">📦 Order #{{ order.id }}</h5>
+                        <p style="margin: 5px 0;"><strong>Customer:</strong> {{ order.customer_name }}</p>
+                        <p style="margin: 5px 0;"><strong>Amount:</strong> <span style="color: #28a745; font-size: 1.2rem; font-weight: bold;">₹{{ order.total_amount }}</span></p>
+                    </div>
+
+                    <button 
+                        id="rzp-button-1" 
+                        style="width: 100%; padding: 20px; font-size: 1.2rem; font-weight: 700; background-color: #28a745; color: white; border: none; border-radius: 10px; cursor: pointer; margin-bottom: 15px; transition: all 0.3s;"
+                    >
+                        🔒 PAY NOW - ₹{{ order.total_amount }}
+                    </button>
+
+                    <p style="text-align: center; color: #666; font-size: 0.85rem;">✅ Secure payment by Razorpay</p>
+                </div>
+
+                <div style="background: #fff3cd; border: 2px solid #FFA500; padding: 20px; border-radius: 10px; margin-top: 20px;">
+                    <h5 style="color: #cc8800; margin-bottom: 12px; font-weight: bold;">🧪 TEST CARD:</h5>
+                    <p style="margin: 5px 0;"><strong>Card:</strong> <code>4111 1111 1111 1111</code></p>
+                    <p style="margin: 5px 0;"><strong>Expiry:</strong> <code>12/25</code></p>
+                    <p style="margin: 5px 0;"><strong>CVV:</strong> <code>123</code></p>
+                </div>
+            </div>
+        </div>
+    </div>
+</section>
+
+<script src="https://checkout.razorpay.com/v1/checkout.js"></script>
+
+<script>
+document.getElementById("rzp-button-1").onclick = function(e) {
+    e.preventDefault();
+    
+    var options = {
+        "key": "{{ razorpay_key_id }}",
+        "amount": Math.round({{ order.total_amount|floatformat:2 }} * 100),
+        "currency": "INR",
+        "name": "Feane Restaurant",
+        "description": "Order #{{ order.id }}",
+        "order_id": "{{ razorpay_order.id }}",
+        
+        "handler": function(response) {
+            // Create form
+            var form = document.createElement("form");
+            form.method = "POST";
+            form.action = "{% url 'payment_success' %}";
+            
+            // CSRF
+            var csrf = document.createElement("input");
+            csrf.type = "hidden";
+            csrf.name = "csrfmiddlewaretoken";
+            csrf.value = "{{ csrf_token }}";
+            form.appendChild(csrf);
+            
+            // Payment data
+            var data = {
+                "razorpay_payment_id": response.razorpay_payment_id,
+                "razorpay_order_id": response.razorpay_order_id,
+                "razorpay_signature": response.razorpay_signature,
+                "order_id": "{{ order.id }}"
+            };
+            
+            for (var key in data) {
+                var input = document.createElement("input");
+                input.type = "hidden";
+                input.name = key;
+                input.value = data[key];
+                form.appendChild(input);
+            }
+            
+            document.body.appendChild(form);
+            form.submit();
+        },
+        
+        "prefill": {
+            "name": "{{ order.customer_name }}",
+            "email": "{{ order.customer_email }}",
+            "contact": "{{ order.customer_phone }}"
+        },
+        
+        "theme": {"color": "#FFA500"}
+    };
+    
+    var rzp = new Razorpay(options);
+    rzp.open();
+}
+</script>
+
+{% endblock %}

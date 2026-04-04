@@ -1,207 +1,241 @@
 {% extends "base.html" %}
-
 {% load static %}
-{% block class %}class="sub_page"{% endblock class %}
+
+{% block title %}Checkout - Feane{% endblock %}
+
+{% block class %}class="sub_page"{% endblock %}
+
 {% block main %}
 
-  <!-- Checkout Section -->
-  <section class="book_section layout_padding">
+<section class="book_section layout_padding">
     <div class="container">
-      <div class="heading_container">
-        <h2>
-          📋 Checkout
-        </h2>
-      </div>
+        <div class="heading_container">
+            <h2>✅ Checkout</h2>
+        </div>
 
-      {% if messages %}
+        {% if messages %}
         <div class="alert alert-info alert-dismissible fade show" role="alert">
-          {% for message in messages %}
+            {% for message in messages %}
             <p>{{ message }}</p>
-          {% endfor %}
-          <button type="button" class="close" data-dismiss="alert" aria-label="Close">
-            <span>&times;</span>
-          </button>
+            {% endfor %}
+            <button type="button" class="close" data-dismiss="alert" aria-label="Close">
+                <span>&times;</span>
+            </button>
         </div>
-      {% endif %}
+        {% endif %}
 
-      <div class="row">
-        <!-- Checkout Form -->
-        <div class="col-md-7">
-          <div class="form_container">
-            <h4 style="margin-bottom: 20px; font-weight: bold;">Delivery Details</h4>
-            
-            <form method="POST" action="{% url 'checkout' %}">
-              {% csrf_token %}
-
-              <!-- Customer Info Section -->
-              <fieldset style="border: 1px solid #ddd; padding: 15px; border-radius: 5px; margin-bottom: 20px;">
-                <legend style="padding: 0 10px; font-weight: bold;">👤 Your Information</legend>
-
-                <div>
-                  <label for="customer_name" style="font-weight: 600; margin-top: 10px; display: block;">Full Name *</label>
-                  <input type="text" id="customer_name" name="customer_name" class="form-control" 
-                         value="{% if user.is_authenticated %}{{ user.first_name }} {{ user.last_name }}{% endif %}"
-                         required placeholder="Enter your full name" />
+        <div class="row">
+            <!-- LEFT COLUMN: CART ITEMS -->
+            <div class="col-lg-8">
+                <div style="background: white; padding: 20px; border-radius: 10px; margin-bottom: 20px;">
+                    <h4 style="margin-bottom: 20px; font-weight: bold;">📦 Order Summary</h4>
+                    
+                    {% if cart_items %}
+                        <div style="overflow-x: auto;">
+                            <table style="width: 100%; border-collapse: collapse;">
+                                <thead style="border-bottom: 2px solid #ddd;">
+                                    <tr>
+                                        <th style="text-align: left; padding: 10px;">Item</th>
+                                        <th style="text-align: center; padding: 10px;">Qty</th>
+                                        <th style="text-align: right; padding: 10px;">Price</th>
+                                        <th style="text-align: right; padding: 10px;">Subtotal</th>
+                                    </tr>
+                                </thead>
+                                <tbody>
+                                    {% for item in cart_items %}
+                                    <tr style="border-bottom: 1px solid #eee;">
+                                        <td style="padding: 15px;">
+                                            <strong>{{ item.item.item_name }}</strong>
+                                            {% if item.item.is_vegetarian %}
+                                                <span style="background: #28a745; color: white; padding: 3px 8px; border-radius: 3px; font-size: 11px; margin-left: 5px;">Veg</span>
+                                            {% endif %}
+                                            {% if item.item.is_spicy %}
+                                                <span style="background: #dc3545; color: white; padding: 3px 8px; border-radius: 3px; font-size: 11px; margin-left: 3px;">Spicy</span>
+                                            {% endif %}
+                                        </td>
+                                        <td style="text-align: center; padding: 15px;">
+                                            <strong>{{ item.quantity }}</strong>
+                                        </td>
+                                        <td style="text-align: right; padding: 15px;">
+                                            <strong>₹{{ item.item.price }}</strong>
+                                        </td>
+                                        <td style="text-align: right; padding: 15px;">
+                                            <strong style="color: #FFA500;">₹{{ item.get_subtotal }}</strong>
+                                        </td>
+                                    </tr>
+                                    {% endfor %}
+                                </tbody>
+                            </table>
+                        </div>
+                    {% else %}
+                        <div style="background: #f8d7da; color: #721c24; padding: 15px; border-radius: 5px; border-left: 4px solid #dc3545;">
+                            ❌ Your cart is empty!
+                        </div>
+                    {% endif %}
                 </div>
 
-                <div style="margin-top: 15px;">
-                  <label for="customer_email" style="font-weight: 600; display: block;">Email Address *</label>
-                  <input type="email" id="customer_email" name="customer_email" class="form-control" 
-                         value="{% if user.is_authenticated %}{{ user.email }}{% endif %}"
-                         required placeholder="your.email@example.com" />
+                <!-- COUPON SECTION -->
+                <div style="background: #fff3cd; border-left: 4px solid #FFA500; padding: 20px; border-radius: 10px; margin-bottom: 20px;">
+                    <h5 style="margin-bottom: 15px; font-weight: bold;">🎟️ Have a Coupon Code?</h5>
+                    <p style="font-size: 0.9rem; margin-bottom: 0; color: #666;">Get instant discount on your order</p>
+                    
+                    <div style="display: flex; gap: 10px; margin-top: 15px;">
+                        <input 
+                            type="text" 
+                            id="coupon-code" 
+                            placeholder="Enter coupon code (e.g., SAVE50)"
+                            maxlength="20"
+                            style="flex: 1; padding: 12px 15px; border: 1px solid #ddd; border-radius: 8px; font-size: 1rem;"
+                        >
+                        <button type="button" onclick="applyCoupon()" style="padding: 12px 30px; background: #FFA500; color: white; border: none; border-radius: 8px; cursor: pointer; font-weight: 600;">
+                            Apply
+                        </button>
+                    </div>
+                    
+                    <div id="coupon-status" style="margin-top: 15px;"></div>
                 </div>
+            </div>
 
-                <div style="margin-top: 15px;">
-                  <label for="customer_phone" style="font-weight: 600; display: block;">Phone Number *</label>
-                  <input type="tel" id="customer_phone" name="customer_phone" class="form-control" 
-                         required placeholder="+91 XXXXX XXXXX" />
+            <!-- RIGHT COLUMN: CHECKOUT FORM -->
+            <div class="col-lg-4">
+                <div style="background: white; padding: 20px; border-radius: 10px; box-shadow: 0 2px 10px rgba(0,0,0,0.1);">
+                    <h4 style="margin-bottom: 20px; font-weight: bold;">✅ Delivery Details</h4>
+
+                    <form method="POST" id="checkout-form">
+                        {% csrf_token %}
+
+                        <div style="margin-bottom: 15px;">
+                            <label style="font-weight: 600; color: #333; display: block; margin-bottom: 5px;">👤 Full Name</label>
+                            <input type="text" class="form-control" name="customer_name" required placeholder="Your name" style="padding: 10px; border: 1px solid #ddd; border-radius: 5px; width: 100%;">
+                        </div>
+
+                        <div style="margin-bottom: 15px;">
+                            <label style="font-weight: 600; color: #333; display: block; margin-bottom: 5px;">📧 Email</label>
+                            <input type="email" class="form-control" name="customer_email" required placeholder="your@email.com" style="padding: 10px; border: 1px solid #ddd; border-radius: 5px; width: 100%;">
+                        </div>
+
+                        <div style="margin-bottom: 15px;">
+                            <label style="font-weight: 600; color: #333; display: block; margin-bottom: 5px;">📱 Phone</label>
+                            <input type="tel" class="form-control" name="customer_phone" required placeholder="10-digit number" style="padding: 10px; border: 1px solid #ddd; border-radius: 5px; width: 100%;">
+                        </div>
+
+                        <div style="margin-bottom: 15px;">
+                            <label style="font-weight: 600; color: #333; display: block; margin-bottom: 5px;">📍 Address</label>
+                            <textarea class="form-control" name="delivery_address" rows="3" required placeholder="Full delivery address" style="padding: 10px; border: 1px solid #ddd; border-radius: 5px; width: 100%;"></textarea>
+                        </div>
+
+                        <div style="margin-bottom: 20px;">
+                            <label style="font-weight: 600; color: #333; display: block; margin-bottom: 5px;">📮 Pincode</label>
+                            <input type="text" class="form-control" name="delivery_pincode" required placeholder="6-digit pincode" style="padding: 10px; border: 1px solid #ddd; border-radius: 5px; width: 100%;">
+                        </div>
+
+                        <!-- PRICE BREAKDOWN -->
+                        <div style="background: #f8f9fa; padding: 15px; border-radius: 8px; margin-bottom: 20px;">
+                            <div style="display: flex; justify-content: space-between; padding: 8px 0; border-bottom: 1px solid #ddd;">
+                                <span>Subtotal:</span>
+                                <span id="subtotal">₹{{ total_price|floatformat:2 }}</span>
+                            </div>
+
+                            <div id="discount-section" style="display: none; justify-content: space-between; padding: 8px 0; border-bottom: 1px solid #ddd; color: #28a745;">
+                                <span>Discount (<span id="discount-percent">0</span>%):</span>
+                                <span id="discount-amount">-₹0</span>
+                            </div>
+
+                            <div style="display: flex; justify-content: space-between; padding: 12px 0; font-size: 1.2rem; font-weight: bold; color: #28a745; border-top: 2px solid #FFA500;">
+                                <span>Total:</span>
+                                <span id="total-amount">₹{{ total_price|floatformat:2 }}</span>
+                            </div>
+                        </div>
+
+                        <!-- PLACE ORDER BUTTON -->
+                        <button type="submit" class="btn btn-success" style="width: 100%; padding: 15px; font-size: 1.1rem; font-weight: 700; border: none; border-radius: 8px; cursor: pointer;">
+                            ✅ Place Order & Pay
+                        </button>
+                    </form>
+
+                    <!-- INFO BOX -->
+                    <div style="background: #d4edda; color: #155724; padding: 12px; border-radius: 5px; margin-top: 15px; border-left: 4px solid #28a745; font-size: 0.9rem;">
+                        <strong>💡 Promo Codes:</strong><br>
+                        • SAVE50 - 50% off<br>
+                        • WELCOME20 - 20% off
+                    </div>
                 </div>
-              </fieldset>
-
-              <!-- Delivery Type -->
-              <fieldset style="border: 1px solid #ddd; padding: 15px; border-radius: 5px; margin-bottom: 20px;">
-                <legend style="padding: 0 10px; font-weight: bold;">🚗 Delivery Type</legend>
-
-                <div style="display: flex; gap: 30px; margin-top: 10px;">
-                  <div>
-                    <input type="radio" id="delivery" name="delivery_type" value="delivery" checked>
-                    <label for="delivery" style="margin-left: 10px; cursor: pointer;">🚗 Home Delivery</label>
-                  </div>
-                  <div>
-                    <input type="radio" id="pickup" name="delivery_type" value="pickup">
-                    <label for="pickup" style="margin-left: 10px; cursor: pointer;">🏪 Pickup</label>
-                  </div>
-                </div>
-              </fieldset>
-
-              <!-- Delivery Address -->
-              <fieldset style="border: 1px solid #ddd; padding: 15px; border-radius: 5px; margin-bottom: 20px;">
-                <legend style="padding: 0 10px; font-weight: bold;">📍 Delivery Address</legend>
-
-                <div style="margin-top: 10px;">
-                  <label for="delivery_address" style="font-weight: 600; display: block;">Full Address *</label>
-                  <textarea id="delivery_address" name="delivery_address" class="form-control" rows="3" 
-                           required placeholder="Enter complete delivery address (House No., Street, Landmark)"></textarea>
-                </div>
-
-                <div style="margin-top: 15px;">
-                  <label for="delivery_city" style="font-weight: 600; display: block;">City *</label>
-                  <input type="text" id="delivery_city" name="delivery_city" class="form-control" 
-                         value="Bangalore" required placeholder="City name" />
-                </div>
-
-                <div style="margin-top: 15px;">
-                  <label for="delivery_pincode" style="font-weight: 600; display: block;">Pincode/Postal Code *</label>
-                  <input type="text" id="delivery_pincode" name="delivery_pincode" class="form-control" 
-                         required placeholder="6-digit pincode" />
-                </div>
-              </fieldset>
-
-              <!-- Special Requests -->
-              <fieldset style="border: 1px solid #ddd; padding: 15px; border-radius: 5px; margin-bottom: 20px;">
-                <legend style="padding: 0 10px; font-weight: bold;">📝 Special Requests (Optional)</legend>
-
-                <div style="margin-top: 10px;">
-                  <textarea id="special_requests" name="special_requests" class="form-control" rows="3" 
-                           placeholder="Any special instructions? (e.g., allergies, preferences, packaging requests)"></textarea>
-                </div>
-              </fieldset>
-
-              <!-- Submit Button -->
-              <div style="margin-top: 20px;">
-                <button type="submit" class="btn btn-success" style="width: 100%; padding: 12px; font-size: 16px;">
-                  Continue to Payment ➜
-                </button>
-              </div>
-
-              <a href="{% url 'view_cart' %}" class="btn btn-outline-secondary" style="width: 100%; padding: 12px; margin-top: 10px;">
-                ← Back to Cart
-              </a>
-            </form>
-          </div>
+            </div>
         </div>
 
-        <!-- Order Summary Sidebar -->
-        <div class="col-md-5">
-          <div class="card" style="border: 1px solid #ddd; border-radius: 10px; padding: 20px; position: sticky; top: 20px;">
-            <h4 style="margin-bottom: 20px; font-weight: bold;">📦 Order Summary</h4>
-            
-            <!-- Cart Items -->
-            <div style="max-height: 300px; overflow-y: auto; margin-bottom: 20px; border-bottom: 1px solid #eee; padding-bottom: 15px;">
-              {% for cart_item in cart_items %}
-              <div style="display: flex; justify-content: space-between; margin-bottom: 12px; padding-bottom: 12px; border-bottom: 1px solid #f0f0f0;">
-                <div>
-                  <strong>{{ cart_item.item.item_name }}</strong>
-                  <p style="font-size: 12px; color: #999; margin: 3px 0;">Qty: {{ cart_item.quantity }}</p>
-                </div>
-                <div style="text-align: right;">
-                  <strong>${{ cart_item.get_subtotal }}</strong>
-                </div>
-              </div>
-              {% endfor %}
-            </div>
-
-            <!-- Pricing Breakdown -->
-            <div style="margin-bottom: 15px; padding-bottom: 10px; border-bottom: 1px solid #eee;">
-              <div style="display: flex; justify-content: space-between; margin-bottom: 10px;">
-                <span>Subtotal:</span>
-                <strong>${{ total_price }}</strong>
-              </div>
-              <div style="display: flex; justify-content: space-between; margin-bottom: 10px;">
-                <span>Delivery Charge:</span>
-                <strong style="color: #ffbe33;">FREE</strong>
-              </div>
-              <div style="display: flex; justify-content: space-between; margin-bottom: 10px;">
-                <span>Tax & Fees:</span>
-                <strong>$0.00</strong>
-              </div>
-            </div>
-
-            <!-- Total -->
-            <div style="display: flex; justify-content: space-between; font-size: 18px; margin-bottom: 20px;">
-              <span style="font-weight: bold;">Total Amount:</span>
-              <strong style="color: #ffbe33;">${{ total_price }}</strong>
-            </div>
-
-            <!-- Info Box -->
-            <div style="background-color: #f8f9fa; padding: 15px; border-radius: 5px; margin-top: 20px;">
-              <p style="font-size: 12px; color: #666; margin: 0;">
-                <strong>ℹ️ Note:</strong> You will be able to track your order status after checkout. We'll send you updates via email and SMS.
-              </p>
-            </div>
-
-            <!-- Items Count -->
-            <div style="background-color: #e8f5e9; padding: 12px; border-radius: 5px; margin-top: 15px; text-align: center;">
-              <p style="margin: 0; color: #2e7d32; font-weight: 600;">
-                🛒 {{ total_items }} items in your order
-              </p>
-            </div>
-          </div>
-        </div>
-      </div>
     </div>
-  </section>
+</section>
 
-  <style>
-    fieldset {
-      margin-bottom: 20px;
+<!-- COUPON JAVASCRIPT -->
+<script>
+let appliedDiscount = 0;
+let discountPercent = 0;
+const originalTotal = parseFloat("{{ total_price|floatformat:2 }}");
+
+function applyCoupon() {
+    const couponCode = document.getElementById('coupon-code').value.trim().toUpperCase();
+    const statusDiv = document.getElementById('coupon-status');
+
+    if (!couponCode) {
+        statusDiv.innerHTML = '<div style="background: #f8d7da; color: #721c24; padding: 10px; border-radius: 5px; border-left: 4px solid #dc3545;">❌ Please enter a coupon code!</div>';
+        return;
     }
 
-    legend {
-      font-weight: bold;
-      color: #333;
-    }
+    // Send coupon to backend
+    fetch('{% url "apply_coupon" %}', {
+        method: 'POST',
+        headers: {
+            'Content-Type': 'application/x-www-form-urlencoded',
+            'X-CSRFToken': '{{ csrf_token }}'
+        },
+        body: 'coupon_code=' + encodeURIComponent(couponCode)
+    })
+    .then(response => response.json())
+    .then(data => {
+        if (data.success) {
+            discountPercent = data.discount_percent;
+            appliedDiscount = (originalTotal * discountPercent) / 100;
+            
+            // Update UI
+            document.getElementById('discount-section').style.display = 'flex';
+            document.getElementById('discount-percent').textContent = discountPercent;
+            document.getElementById('discount-amount').textContent = '-₹' + appliedDiscount.toFixed(2);
+            
+            const finalTotal = originalTotal - appliedDiscount;
+            document.getElementById('total-amount').textContent = '₹' + finalTotal.toFixed(2);
+            
+            statusDiv.innerHTML = '<div style="background: #d4edda; color: #155724; padding: 10px; border-radius: 5px; border-left: 4px solid #28a745;">✅ ' + data.message + '</div>';
+            
+            // Store coupon code in form
+            let couponInput = document.querySelector('input[name="coupon_code"]');
+            if (!couponInput) {
+                couponInput = document.createElement('input');
+                couponInput.type = 'hidden';
+                couponInput.name = 'coupon_code';
+                document.getElementById('checkout-form').appendChild(couponInput);
+            }
+            couponInput.value = couponCode;
+        } else {
+            statusDiv.innerHTML = '<div style="background: #f8d7da; color: #721c24; padding: 10px; border-radius: 5px; border-left: 4px solid #dc3545;">❌ ' + data.message + '</div>';
+        }
+    })
+    .catch(error => {
+        console.error('Error:', error);
+        statusDiv.innerHTML = '<div style="background: #f8d7da; color: #721c24; padding: 10px; border-radius: 5px; border-left: 4px solid #dc3545;">❌ Error applying coupon</div>';
+    });
+}
 
-    .form-control {
-      border: 1px solid #ddd;
-      border-radius: 5px;
-      padding: 10px;
+// Enter key support
+document.addEventListener('DOMContentLoaded', function() {
+    const couponInput = document.getElementById('coupon-code');
+    if (couponInput) {
+        couponInput.addEventListener('keypress', function(e) {
+            if (e.key === 'Enter') {
+                applyCoupon();
+            }
+        });
     }
+});
+</script>
 
-    .form-control:focus {
-      border-color: #ffbe33;
-      box-shadow: 0 0 5px rgba(255, 190, 51, 0.3);
-    }
-  </style>
-
-{% endblock main %}
+{% endblock %}

@@ -9,42 +9,27 @@ from datetime import timedelta
 # ============================================================================
 
 class ItemList(models.Model):
-    """Restaurant menu categories (Appetizers, Mains, Desserts, etc.)"""
+    """Restaurant menu categories"""
     
     category_name = models.CharField(
         max_length=50, 
         unique=True,
         default='Uncategorized',
-        help_text="Category name (e.g., Appetizers, Main Course, Desserts)"
+        help_text="Category name"
     )
-    description = models.TextField(
-        blank=True, 
-        help_text="Category description"
-    )
-    display_order = models.IntegerField(
-        default=0, 
-        help_text="Order to display categories"
-    )
-    is_active = models.BooleanField(
-        default=True,
-        help_text="Hide/show this category"
-    )
+    description = models.TextField(blank=True, help_text="Category description")
+    display_order = models.IntegerField(default=0, help_text="Order to display")
+    is_active = models.BooleanField(default=True, help_text="Active?")
     created_at = models.DateTimeField(auto_now_add=True)
     updated_at = models.DateTimeField(auto_now=True)
 
     class Meta:
         ordering = ['display_order', 'category_name']
         verbose_name_plural = "Item Lists"
-        indexes = [
-            models.Index(fields=['is_active', 'display_order']),
-        ]
+        indexes = [models.Index(fields=['is_active', 'display_order'])]
 
     def __str__(self):
         return self.category_name
-
-    def get_active_items_count(self):
-        """Get count of active items in this category"""
-        return self.items.filter(is_available=True).count()
 
 
 # ============================================================================
@@ -54,54 +39,16 @@ class ItemList(models.Model):
 class Items(models.Model):
     """Menu items with pricing and images"""
     
-    item_name = models.CharField(
-        max_length=100,
-        default='Unknown Item',
-        help_text="Name of the menu item"
-    )
-    description = models.TextField(
-        blank=False,
-        default='',
-        help_text="Detailed description of the item"
-    )
-    price = models.DecimalField(
-        max_digits=8, 
-        decimal_places=2,
-        validators=[MinValueValidator(0)],
-        help_text="Price of the item"
-    )
-    category = models.ForeignKey(
-        ItemList, 
-        related_name='items',
-        on_delete=models.CASCADE,
-        help_text="Category this item belongs to"
-    )
-    image = models.ImageField(
-        upload_to='items/',
-        default='items/default.png',
-        help_text="Item image"
-    )
-    is_available = models.BooleanField(
-        default=True,
-        help_text="Is this item available for ordering?"
-    )
-    is_vegetarian = models.BooleanField(
-        default=False,
-        help_text="Is this item vegetarian?"
-    )
-    is_vegan = models.BooleanField(
-        default=False,
-        help_text="Is this item vegan?"
-    )
-    is_spicy = models.BooleanField(
-        default=False,
-        help_text="Is this item spicy?"
-    )
-    preparation_time = models.IntegerField(
-        default=15,
-        validators=[MinValueValidator(1)],
-        help_text="Estimated preparation time in minutes"
-    )
+    item_name = models.CharField(max_length=100, default='Unknown Item')
+    description = models.TextField(blank=False, default='')
+    price = models.DecimalField(max_digits=8, decimal_places=2, validators=[MinValueValidator(0)])
+    category = models.ForeignKey(ItemList, related_name='items', on_delete=models.CASCADE)
+    image = models.ImageField(upload_to='items/', default='items/default.png')
+    is_available = models.BooleanField(default=True)
+    is_vegetarian = models.BooleanField(default=False)
+    is_vegan = models.BooleanField(default=False)
+    is_spicy = models.BooleanField(default=False)
+    preparation_time = models.IntegerField(default=15, validators=[MinValueValidator(1)])
     created_at = models.DateTimeField(auto_now_add=True)
     updated_at = models.DateTimeField(auto_now=True)
 
@@ -116,17 +63,6 @@ class Items(models.Model):
     def __str__(self):
         return f"{self.item_name} - ₹{self.price}"
 
-    def get_dietary_tags(self):
-        """Get dietary tags for this item"""
-        tags = []
-        if self.is_vegetarian:
-            tags.append("Vegetarian")
-        if self.is_vegan:
-            tags.append("Vegan")
-        if self.is_spicy:
-            tags.append("Spicy")
-        return tags
-
 
 # ============================================================================
 # ABOUT US MODEL
@@ -135,41 +71,17 @@ class Items(models.Model):
 class AboutUs(models.Model):
     """Restaurant information page"""
     
-    description = models.TextField(
-        blank=False,
-        default='',
-        help_text="Restaurant description and about information"
-    )
+    description = models.TextField(blank=False, default='')
     phone = models.CharField(
         max_length=15,
         blank=True,
-        validators=[RegexValidator(r'^\+?1?\d{9,15}$', 'Enter a valid phone number')],
-        help_text="Contact phone number"
+        validators=[RegexValidator(r'^\+?1?\d{9,15}$', 'Enter valid phone')]
     )
-    email = models.EmailField(
-        blank=True,
-        help_text="Contact email address"
-    )
-    address = models.CharField(
-        max_length=255,
-        blank=True,
-        help_text="Restaurant physical address"
-    )
-    opening_hours = models.CharField(
-        max_length=100,
-        blank=True,
-        help_text="Opening hours (e.g., 10:00 AM - 10:00 PM)"
-    )
-    latitude = models.FloatField(
-        blank=True,
-        null=True,
-        help_text="Latitude for map"
-    )
-    longitude = models.FloatField(
-        blank=True,
-        null=True,
-        help_text="Longitude for map"
-    )
+    email = models.EmailField(blank=True)
+    address = models.CharField(max_length=255, blank=True)
+    opening_hours = models.CharField(max_length=100, blank=True)
+    latitude = models.FloatField(blank=True, null=True)
+    longitude = models.FloatField(blank=True, null=True)
     updated_at = models.DateTimeField(auto_now=True)
 
     class Meta:
@@ -194,49 +106,25 @@ class Feedback(models.Model):
         (5, '⭐⭐⭐⭐⭐ Excellent'),
     ]
 
-    user_name = models.CharField(
-        max_length=100,
-        default='Anonymous',
-        help_text="Name of the reviewer"
-    )
-    email = models.EmailField(
-        help_text="Email of the reviewer"
-    )
-    description = models.TextField(
-        blank=False,
-        help_text="Detailed review/feedback"
-    )
+    user_name = models.CharField(max_length=100, default='Anonymous')
+    email = models.EmailField()
+    description = models.TextField(blank=False)
     rating = models.IntegerField(
         choices=RATING_CHOICES,
-        validators=[MinValueValidator(1), MaxValueValidator(5)],
-        help_text="Rating from 1-5"
+        validators=[MinValueValidator(1), MaxValueValidator(5)]
     )
-    image = models.ImageField(
-        upload_to='feedback/',
-        blank=True,
-        null=True,
-        help_text="Optional image from reviewer"
-    )
-    is_approved = models.BooleanField(
-        default=False,
-        help_text="Has this review been approved?"
-    )
+    image = models.ImageField(upload_to='feedback/', blank=True, null=True)
+    is_approved = models.BooleanField(default=False)
     created_at = models.DateTimeField(auto_now_add=True)
     updated_at = models.DateTimeField(auto_now=True)
 
     class Meta:
         ordering = ['-created_at']
-        indexes = [
-            models.Index(fields=['is_approved', '-created_at']),
-        ]
+        indexes = [models.Index(fields=['is_approved', '-created_at'])]
         verbose_name_plural = "Feedback"
 
     def __str__(self):
         return f"{self.user_name} - {self.rating} stars"
-
-    def get_rating_display_stars(self):
-        """Get star representation of rating"""
-        return "⭐" * self.rating
 
 
 # ============================================================================
@@ -254,43 +142,18 @@ class BookTable(models.Model):
         ('no_show', 'No Show'),
     ]
 
-    name = models.CharField(
-        max_length=100,
-        help_text="Customer name"
-    )
-    email = models.EmailField(
-        help_text="Customer email address"
-    )
+    name = models.CharField(max_length=100)
+    email = models.EmailField()
     phone_number = models.CharField(
         max_length=15,
-        validators=[RegexValidator(r'^\+?1?\d{9,15}$', 'Enter a valid phone number')],
-        help_text="Customer contact number"
+        validators=[RegexValidator(r'^\+?1?\d{9,15}$', 'Enter valid phone')]
     )
-    total_persons = models.IntegerField(
-        validators=[MinValueValidator(1), MaxValueValidator(20)],
-        help_text="Number of people (1-20)"
-    )
-    booking_date = models.DateField(
-        help_text="Date of booking"
-    )
-    booking_time = models.TimeField(
-        default='19:00',
-        help_text="Preferred booking time"
-    )
-    special_requests = models.TextField(
-        blank=True,
-        help_text="Any special requirements (e.g., high chair, allergy info)"
-    )
-    status = models.CharField(
-        max_length=20,
-        choices=STATUS_CHOICES,
-        default='pending',
-        help_text="Current booking status"
-    )
-    confirmation_sent = models.BooleanField(
-        default=False,
-        help_text="Has confirmation email been sent?"
-    )
+    total_persons = models.IntegerField(validators=[MinValueValidator(1), MaxValueValidator(20)])
+    booking_date = models.DateField()
+    booking_time = models.TimeField(default='19:00')
+    special_requests = models.TextField(blank=True)
+    status = models.CharField(max_length=20, choices=STATUS_CHOICES, default='pending')
+    confirmation_sent = models.BooleanField(default=False)
     created_at = models.DateTimeField(auto_now_add=True)
     updated_at = models.DateTimeField(auto_now=True)
 
@@ -305,60 +168,16 @@ class BookTable(models.Model):
     def __str__(self):
         return f"{self.name} - {self.booking_date} at {self.booking_time}"
 
-    def is_upcoming(self):
-        """Check if booking is in the future"""
-        from datetime import datetime
-        booking_datetime = datetime.combine(self.booking_date, self.booking_time)
-        booking_datetime = timezone.make_aware(booking_datetime)
-        return booking_datetime > timezone.now()
-
-    def is_today(self):
-        """Check if booking is today"""
-        return self.booking_date == timezone.now().date()
-
-    def get_time_until_booking(self):
-        """Get time remaining until booking"""
-        from datetime import datetime
-        booking_datetime = datetime.combine(self.booking_date, self.booking_time)
-        booking_datetime = timezone.make_aware(booking_datetime)
-        time_diff = booking_datetime - timezone.now()
-        return time_diff
-
-    def can_cancel(self):
-        """Check if booking can be cancelled (at least 2 hours before)"""
-        if not self.is_upcoming():
-            return False
-        time_until = self.get_time_until_booking()
-        return time_until > timedelta(hours=2)
-
-    def mark_completed(self):
-        """Mark booking as completed"""
-        self.status = 'completed'
-        self.save()
-
-    def mark_no_show(self):
-        """Mark booking as no-show"""
-        self.status = 'no_show'
-        self.save()
-
 
 # ============================================================================
-# FAVORITE ITEMS MODEL (NEW FEATURE)
+# FAVORITE ITEMS MODEL
 # ============================================================================
 
 class FavoriteItem(models.Model):
-    """User's favorite items (wishlist)"""
+    """User's favorite items"""
     
-    user_ip = models.CharField(
-        max_length=100,
-        help_text="IP address of user (for anonymous users)"
-    )
-    item = models.ForeignKey(
-        Items,
-        related_name='favorites',
-        on_delete=models.CASCADE,
-        help_text="Favorite item"
-    )
+    user_ip = models.CharField(max_length=100)
+    item = models.ForeignKey(Items, related_name='favorites', on_delete=models.CASCADE)
     added_at = models.DateTimeField(auto_now_add=True)
 
     class Meta:
@@ -370,67 +189,37 @@ class FavoriteItem(models.Model):
 
 
 # ============================================================================
-# SPECIAL OFFERS MODEL (NEW FEATURE)
+# SPECIAL OFFERS MODEL
 # ============================================================================
 
 class SpecialOffer(models.Model):
     """Special offers and promotions"""
     
-    title = models.CharField(
-        max_length=100,
-        help_text="Offer title"
-    )
-    description = models.TextField(
-        help_text="Detailed offer description"
-    )
-    discount_percentage = models.IntegerField(
-        validators=[MinValueValidator(0), MaxValueValidator(100)],
-        help_text="Discount percentage"
-    )
-    valid_from = models.DateTimeField(
-        help_text="Offer start date and time"
-    )
-    valid_until = models.DateTimeField(
-        help_text="Offer end date and time"
-    )
-    applicable_items = models.ManyToManyField(
-        Items,
-        blank=True,
-        help_text="Items this offer applies to (leave empty for all)"
-    )
-    image = models.ImageField(
-        upload_to='offers/',
-        blank=True,
-        help_text="Offer banner image"
-    )
-    is_active = models.BooleanField(
-        default=True,
-        help_text="Is this offer currently active?"
-    )
+    title = models.CharField(max_length=100)
+    description = models.TextField()
+    discount_percentage = models.IntegerField(validators=[MinValueValidator(0), MaxValueValidator(100)])
+    valid_from = models.DateTimeField()
+    valid_until = models.DateTimeField()
+    applicable_items = models.ManyToManyField(Items, blank=True)
+    image = models.ImageField(upload_to='offers/', blank=True)
+    is_active = models.BooleanField(default=True)
     created_at = models.DateTimeField(auto_now_add=True)
     updated_at = models.DateTimeField(auto_now=True)
 
     class Meta:
         ordering = ['-valid_from']
-        indexes = [
-            models.Index(fields=['is_active', '-valid_from']),
-        ]
+        indexes = [models.Index(fields=['is_active', '-valid_from'])]
 
     def __str__(self):
         return f"{self.title} - {self.discount_percentage}% off"
 
-    def is_currently_valid(self):
-        """Check if offer is currently valid"""
-        now = timezone.now()
-        return self.is_active and self.valid_from <= now <= self.valid_until
-
 
 # ============================================================================
-# BOOKING NOTIFICATION MODEL (NEW FEATURE)
+# BOOKING NOTIFICATION MODEL
 # ============================================================================
 
 class BookingNotification(models.Model):
-    """Track booking notifications sent to customers"""
+    """Track booking notifications"""
     
     NOTIFICATION_TYPE_CHOICES = [
         ('confirmation', 'Booking Confirmation'),
@@ -440,37 +229,21 @@ class BookingNotification(models.Model):
         ('completion', 'Booking Completed'),
     ]
 
-    booking = models.ForeignKey(
-        BookTable,
-        related_name='notifications',
-        on_delete=models.CASCADE,
-        help_text="Related booking"
-    )
-    notification_type = models.CharField(
-        max_length=20,
-        choices=NOTIFICATION_TYPE_CHOICES,
-        help_text="Type of notification"
-    )
+    booking = models.ForeignKey(BookTable, related_name='notifications', on_delete=models.CASCADE)
+    notification_type = models.CharField(max_length=20, choices=NOTIFICATION_TYPE_CHOICES)
     sent_at = models.DateTimeField(auto_now_add=True)
-    is_sent = models.BooleanField(
-        default=True,
-        help_text="Was notification sent successfully?"
-    )
-    error_message = models.TextField(
-        blank=True,
-        help_text="Error message if sending failed"
-    )
+    is_sent = models.BooleanField(default=True)
+    error_message = models.TextField(blank=True)
 
     class Meta:
         ordering = ['-sent_at']
-        indexes = [
-            models.Index(fields=['booking', 'notification_type']),
-        ]
+        indexes = [models.Index(fields=['booking', 'notification_type'])]
 
     def __str__(self):
         return f"{self.booking.name} - {self.get_notification_type_display()}"
 
-        # ============================================================================
+
+# ============================================================================
 # SHOPPING CART MODELS
 # ============================================================================
 
@@ -482,15 +255,9 @@ class Cart(models.Model):
         on_delete=models.CASCADE,
         null=True,
         blank=True,
-        related_name='cart',
-        help_text="User who owns this cart"
+        related_name='cart'
     )
-    session_key = models.CharField(
-        max_length=40,
-        blank=True,
-        null=True,
-        help_text="Session key for anonymous users"
-    )
+    session_key = models.CharField(max_length=40, blank=True, null=True)
     created_at = models.DateTimeField(auto_now_add=True)
     updated_at = models.DateTimeField(auto_now=True)
 
@@ -523,22 +290,9 @@ class Cart(models.Model):
 class CartItem(models.Model):
     """Individual items in the cart"""
     
-    cart = models.ForeignKey(
-        Cart,
-        related_name='items',
-        on_delete=models.CASCADE,
-        help_text="Shopping cart this item belongs to"
-    )
-    item = models.ForeignKey(
-        Items,
-        on_delete=models.CASCADE,
-        help_text="Menu item in cart"
-    )
-    quantity = models.IntegerField(
-        default=1,
-        validators=[MinValueValidator(1)],
-        help_text="Quantity of this item"
-    )
+    cart = models.ForeignKey(Cart, related_name='items', on_delete=models.CASCADE)
+    item = models.ForeignKey(Items, on_delete=models.CASCADE)
+    quantity = models.IntegerField(default=1, validators=[MinValueValidator(1)])
     added_at = models.DateTimeField(auto_now_add=True)
     updated_at = models.DateTimeField(auto_now=True)
 
@@ -553,22 +307,9 @@ class CartItem(models.Model):
         """Calculate subtotal for this cart item"""
         return self.item.price * self.quantity
 
-    def increase_quantity(self, amount=1):
-        """Increase item quantity"""
-        self.quantity += amount
-        self.save()
 
-    def decrease_quantity(self, amount=1):
-        """Decrease item quantity"""
-        if self.quantity > amount:
-            self.quantity -= amount
-            self.save()
-        else:
-            self.delete()
-
-
-            # ============================================================================
-# ORDER MODEL
+# ============================================================================
+# ORDER MODELS
 # ============================================================================
 
 class Order(models.Model):
@@ -588,78 +329,24 @@ class Order(models.Model):
         ('pickup', 'Pickup'),
     ]
 
-    # Customer Info
-    customer_name = models.CharField(
-        max_length=100,
-        help_text="Customer full name"
-    )
-    customer_email = models.EmailField(
-        help_text="Customer email address"
-    )
-    customer_phone = models.CharField(
-        max_length=15,
-        help_text="Customer phone number"
-    )
-
-    # Delivery Info
-    delivery_type = models.CharField(
-        max_length=20,
-        choices=DELIVERY_TYPE_CHOICES,
-        default='delivery',
-        help_text="Delivery or Pickup"
-    )
-    delivery_address = models.TextField(
-        help_text="Full delivery address"
-    )
-    delivery_city = models.CharField(
-        max_length=50,
-        default='Bangalore',
-        help_text="City for delivery"
-    )
-    delivery_pincode = models.CharField(
-        max_length=10,
-        help_text="Pincode/Postal code"
-    )
-
-    # Order Details
-    total_amount = models.DecimalField(
-        max_digits=10,
-        decimal_places=2,
-        validators=[MinValueValidator(0)],
-        help_text="Total order amount"
-    )
-    special_requests = models.TextField(
-        blank=True,
-        help_text="Special instructions (allergies, preferences, etc.)"
-    )
-
-    # Status
-    status = models.CharField(
-        max_length=20,
-        choices=ORDER_STATUS_CHOICES,
-        default='pending',
-        help_text="Order status"
-    )
-    
+    customer_name = models.CharField(max_length=100)
+    customer_email = models.EmailField()
+    customer_phone = models.CharField(max_length=15)
+    delivery_type = models.CharField(max_length=20, choices=DELIVERY_TYPE_CHOICES, default='delivery')
+    delivery_address = models.TextField()
+    delivery_city = models.CharField(max_length=50, default='Bangalore')
+    delivery_pincode = models.CharField(max_length=10)
+    total_amount = models.DecimalField(max_digits=10, decimal_places=2, validators=[MinValueValidator(0)])
+    special_requests = models.TextField(blank=True)
+    status = models.CharField(max_length=20, choices=ORDER_STATUS_CHOICES, default='pending')
     payment_status = models.CharField(
         max_length=20,
-        choices=[
-            ('pending', 'Pending'),
-            ('completed', 'Completed'),
-            ('failed', 'Failed'),
-        ],
-        default='pending',
-        help_text="Payment status"
+        choices=[('pending', 'Pending'), ('completed', 'Completed'), ('failed', 'Failed')],
+        default='pending'
     )
-
-    # Timestamps
     created_at = models.DateTimeField(auto_now_add=True)
     updated_at = models.DateTimeField(auto_now=True)
-    estimated_delivery = models.DateTimeField(
-        blank=True,
-        null=True,
-        help_text="Estimated delivery time"
-    )
+    estimated_delivery = models.DateTimeField(blank=True, null=True)
 
     class Meta:
         ordering = ['-created_at']
@@ -675,68 +362,15 @@ class Order(models.Model):
         """Get total number of items in order"""
         return sum(item.quantity for item in self.items.all())
 
-    def get_status_display_badge(self):
-        """Get colored badge for status"""
-        colors = {
-            'pending': 'warning',
-            'confirmed': 'info',
-            'preparing': 'primary',
-            'ready': 'success',
-            'delivered': 'success',
-            'cancelled': 'danger',
-        }
-        return colors.get(self.status, 'secondary')
-
-    def mark_confirmed(self):
-        """Mark order as confirmed"""
-        self.status = 'confirmed'
-        self.save()
-
-    def mark_preparing(self):
-        """Mark order as preparing"""
-        self.status = 'preparing'
-        self.save()
-
-    def mark_ready(self):
-        """Mark order as ready"""
-        self.status = 'ready'
-        self.save()
-
-    def mark_delivered(self):
-        """Mark order as delivered"""
-        self.status = 'delivered'
-        self.save()
-
 
 class OrderItem(models.Model):
     """Individual items in an order"""
     
-    order = models.ForeignKey(
-        Order,
-        related_name='items',
-        on_delete=models.CASCADE,
-        help_text="Order this item belongs to"
-    )
-    item = models.ForeignKey(
-        Items,
-        on_delete=models.CASCADE,
-        help_text="Menu item ordered"
-    )
-    quantity = models.IntegerField(
-        default=1,
-        validators=[MinValueValidator(1)],
-        help_text="Quantity ordered"
-    )
-    price_at_purchase = models.DecimalField(
-        max_digits=8,
-        decimal_places=2,
-        help_text="Item price at time of order"
-    )
-    subtotal = models.DecimalField(
-        max_digits=10,
-        decimal_places=2,
-        help_text="Subtotal for this item"
-    )
+    order = models.ForeignKey(Order, related_name='items', on_delete=models.CASCADE)
+    item = models.ForeignKey(Items, on_delete=models.CASCADE)
+    quantity = models.IntegerField(default=1, validators=[MinValueValidator(1)])
+    price_at_purchase = models.DecimalField(max_digits=8, decimal_places=2)
+    subtotal = models.DecimalField(max_digits=10, decimal_places=2)
     added_at = models.DateTimeField(auto_now_add=True)
 
     class Meta:
@@ -749,3 +383,141 @@ class OrderItem(models.Model):
         """Calculate subtotal before saving"""
         self.subtotal = self.price_at_purchase * self.quantity
         super().save(*args, **kwargs)
+
+
+# ============================================================================
+# ITEM RATING MODEL
+# ============================================================================
+
+class ItemRating(models.Model):
+    """Customer ratings and reviews for menu items"""
+    
+    RATING_CHOICES = [
+        (1, '⭐ Poor'),
+        (2, '⭐⭐ Fair'),
+        (3, '⭐⭐⭐ Good'),
+        (4, '⭐⭐⭐⭐ Very Good'),
+        (5, '⭐⭐⭐⭐⭐ Excellent'),
+    ]
+    
+    item = models.ForeignKey(Items, related_name='itemrating_set', on_delete=models.CASCADE)
+    customer_name = models.CharField(max_length=100)
+    customer_email = models.EmailField()
+    rating = models.IntegerField(
+        choices=RATING_CHOICES,
+        validators=[MinValueValidator(1), MaxValueValidator(5)]
+    )
+    review = models.TextField(blank=True)
+    is_approved = models.BooleanField(default=False)
+    created_at = models.DateTimeField(auto_now_add=True)
+    updated_at = models.DateTimeField(auto_now=True)
+    
+    class Meta:
+        ordering = ['-created_at']
+        indexes = [models.Index(fields=['item', 'is_approved'])]
+        unique_together = ('item', 'customer_email')
+    
+    def __str__(self):
+        return f"{self.customer_name} - {self.item.item_name} ({self.rating}★)"
+
+
+# ============================================================================
+# FEATURE 1: WISHLIST
+# ============================================================================
+
+class Wishlist(models.Model):
+    """User's wishlist - items they want to buy later"""
+    
+    user = models.ForeignKey('auth.User', on_delete=models.CASCADE, related_name='wishlist')
+    item = models.ForeignKey(Items, on_delete=models.CASCADE, related_name='wishlisted_by')
+    added_at = models.DateTimeField(auto_now_add=True)
+    
+    class Meta:
+        unique_together = ('user', 'item')
+        ordering = ['-added_at']
+    
+    def __str__(self):
+        return f"{self.user.username} - {self.item.item_name}"
+
+
+# ============================================================================
+# FEATURE 2: COUPON SYSTEM
+# ============================================================================
+
+class Coupon(models.Model):
+    """Discount coupons/promo codes"""
+    
+    code = models.CharField(max_length=20, unique=True)
+    description = models.CharField(max_length=200)
+    discount_percent = models.IntegerField(validators=[MinValueValidator(1), MaxValueValidator(100)])
+    max_uses = models.IntegerField(default=100, validators=[MinValueValidator(1)])
+    times_used = models.IntegerField(default=0)
+    min_order_amount = models.DecimalField(max_digits=10, decimal_places=2, default=0)
+    expiry_date = models.DateTimeField()
+    is_active = models.BooleanField(default=True)
+    created_at = models.DateTimeField(auto_now_add=True)
+    
+    class Meta:
+        ordering = ['-created_at']
+    
+    def __str__(self):
+        return f"{self.code} - {self.discount_percent}% off"
+    
+    def is_valid(self):
+        """Check if coupon is still valid"""
+        return self.is_active and self.times_used < self.max_uses and timezone.now() < self.expiry_date
+
+
+# ============================================================================
+# FEATURE 3: ORDER REVIEW
+# ============================================================================
+
+class OrderReview(models.Model):
+    """Customer reviews for completed orders"""
+    
+    RATING_CHOICES = [
+        (1, '⭐ Poor'),
+        (2, '⭐⭐ Fair'),
+        (3, '⭐⭐⭐ Good'),
+        (4, '⭐⭐⭐⭐ Very Good'),
+        (5, '⭐⭐⭐⭐⭐ Excellent'),
+    ]
+    
+    order = models.OneToOneField(Order, on_delete=models.CASCADE, related_name='review')
+    user = models.ForeignKey('auth.User', on_delete=models.CASCADE, related_name='order_reviews')
+    rating = models.IntegerField(
+        choices=RATING_CHOICES,
+        validators=[MinValueValidator(1), MaxValueValidator(5)]
+    )
+    review = models.TextField(blank=True)
+    is_approved = models.BooleanField(default=False)
+    created_at = models.DateTimeField(auto_now_add=True)
+    
+    class Meta:
+        ordering = ['-created_at']
+    
+    def __str__(self):
+        return f"Order #{self.order.id} - {self.rating}★"
+
+
+# ============================================================================
+# FEATURE 4: DAILY SPECIALS
+# ============================================================================
+
+class DailySpecial(models.Model):
+    """Daily special offers"""
+    
+    item = models.ForeignKey(Items, on_delete=models.CASCADE, related_name='daily_specials')
+    date = models.DateField()
+    discount_percent = models.IntegerField(validators=[MinValueValidator(1), MaxValueValidator(100)])
+    special_price = models.DecimalField(max_digits=8, decimal_places=2, validators=[MinValueValidator(0)])
+    description = models.CharField(max_length=200, blank=True)
+    is_active = models.BooleanField(default=True)
+    created_at = models.DateTimeField(auto_now_add=True)
+    
+    class Meta:
+        ordering = ['-date']
+        unique_together = ('item', 'date')
+    
+    def __str__(self):
+        return f"{self.item.item_name} - {self.discount_percent}% off on {self.date}"

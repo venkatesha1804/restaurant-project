@@ -1,38 +1,17 @@
 """
 Django settings for Resturant_Project project.
-Enhanced for security and production readiness.
 """
 
 from pathlib import Path
 import os
 from decouple import config
-
-# ============================================================================
-# BUILD PATH
-# ============================================================================
+import dj_database_url
 
 BASE_DIR = Path(__file__).resolve().parent.parent
 
-# ============================================================================
-# SECURITY SETTINGS
-# ============================================================================
-
-SECRET_KEY = config(
-    'SECRET_KEY',
-    default='django-insecure-t_!n%3ph(-bpkd2+z2!zujx+6r_x%&3%allmra#8#x0v*iogzf'
-)
-
+SECRET_KEY = config('SECRET_KEY', default='django-insecure-t_!n%3ph(-bpkd2+z2!zujx+6r_x%&3%allmra#8#x0v*iogzf')
 DEBUG = config('DEBUG', default=True, cast=bool)
-
-ALLOWED_HOSTS = config(
-    'ALLOWED_HOSTS',
-    default='localhost,127.0.0.1',
-    cast=lambda v: [s.strip() for s in v.split(',')]
-)
-
-# ============================================================================
-# INSTALLED APPS
-# ============================================================================
+ALLOWED_HOSTS = ['localhost', '127.0.0.1']
 
 INSTALLED_APPS = [
     'django.contrib.admin',
@@ -44,10 +23,6 @@ INSTALLED_APPS = [
     'Base_App',
 ]
 
-# ============================================================================
-# MIDDLEWARE
-# ============================================================================
-
 MIDDLEWARE = [
     'django.middleware.security.SecurityMiddleware',
     'django.contrib.sessions.middleware.SessionMiddleware',
@@ -58,15 +33,7 @@ MIDDLEWARE = [
     'django.middleware.clickjacking.XFrameOptionsMiddleware',
 ]
 
-# ============================================================================
-# URL CONFIGURATION
-# ============================================================================
-
 ROOT_URLCONF = 'Resturant_Project.urls'
-
-# ============================================================================
-# TEMPLATES
-# ============================================================================
 
 TEMPLATES = [
     {
@@ -84,15 +51,7 @@ TEMPLATES = [
     },
 ]
 
-# ============================================================================
-# WSGI APPLICATION
-# ============================================================================
-
 WSGI_APPLICATION = 'Resturant_Project.wsgi.application'
-
-# ============================================================================
-# DATABASE
-# ============================================================================
 
 DATABASES = {
     'default': {
@@ -101,102 +60,63 @@ DATABASES = {
     }
 }
 
-# ============================================================================
-# PASSWORD VALIDATION
-# ============================================================================
-
 AUTH_PASSWORD_VALIDATORS = [
-    {
-        'NAME': 'django.contrib.auth.password_validation.UserAttributeSimilarityValidator',
-    },
-    {
-        'NAME': 'django.contrib.auth.password_validation.MinimumLengthValidator',
-        'OPTIONS': {
-            'min_length': 8,
-        }
-    },
-    {
-        'NAME': 'django.contrib.auth.password_validation.CommonPasswordValidator',
-    },
-    {
-        'NAME': 'django.contrib.auth.password_validation.NumericPasswordValidator',
-    },
+    {'NAME': 'django.contrib.auth.password_validation.UserAttributeSimilarityValidator'},
+    {'NAME': 'django.contrib.auth.password_validation.MinimumLengthValidator', 'OPTIONS': {'min_length': 8}},
+    {'NAME': 'django.contrib.auth.password_validation.CommonPasswordValidator'},
+    {'NAME': 'django.contrib.auth.password_validation.NumericPasswordValidator'},
 ]
 
-# ============================================================================
-# INTERNATIONALIZATION
-# ============================================================================
-
 LANGUAGE_CODE = 'en-us'
-TIME_ZONE = 'UTC'
+TIME_ZONE = 'Asia/Kolkata'
 USE_I18N = True
 USE_TZ = True
-
-# ============================================================================
-# STATIC FILES
-# ============================================================================
 
 STATIC_URL = '/static/'
 STATIC_ROOT = BASE_DIR / 'staticfiles'
 STATICFILES_DIRS = [BASE_DIR / 'static']
 
-# ============================================================================
-# MEDIA FILES
-# ============================================================================
-
 MEDIA_URL = '/media/'
 MEDIA_ROOT = BASE_DIR / 'media'
 
-# ============================================================================
-# DEFAULT PRIMARY KEY FIELD TYPE
-# ============================================================================
-
 DEFAULT_AUTO_FIELD = 'django.db.models.BigAutoField'
-
-# ============================================================================
-# AUTHENTICATION
-# ============================================================================
 
 LOGIN_URL = 'login'
 LOGIN_REDIRECT_URL = 'Home'
 LOGOUT_REDIRECT_URL = 'Home'
 
-# ============================================================================
-# SESSION CONFIGURATION
-# ============================================================================
-
 SESSION_ENGINE = 'django.contrib.sessions.backends.db'
 SESSION_COOKIE_AGE = 1209600
 SESSION_COOKIE_HTTPONLY = True
-SESSION_COOKIE_SECURE = config('SESSION_COOKIE_SECURE', default=False, cast=bool)
+SESSION_COOKIE_SECURE = False
 SESSION_COOKIE_SAMESITE = 'Lax'
 
-# ============================================================================
-# CSRF PROTECTION
-# ============================================================================
-
 CSRF_COOKIE_HTTPONLY = True
-CSRF_COOKIE_SECURE = config('CSRF_COOKIE_SECURE', default=False, cast=bool)
+CSRF_COOKIE_SECURE = False
 CSRF_COOKIE_SAMESITE = 'Lax'
-CSRF_TRUSTED_ORIGINS = config(
-    'CSRF_TRUSTED_ORIGINS',
-    default='http://localhost:8000,http://127.0.0.1:8000',
-    cast=lambda v: [s.strip() for s in v.split(',')]
-)
-
-# ============================================================================
-# SECURITY HEADERS
-# ============================================================================
+CSRF_TRUSTED_ORIGINS = ['http://localhost:8000', 'http://127.0.0.1:8000']
 
 SECURE_BROWSER_XSS_FILTER = True
 X_FRAME_OPTIONS = 'DENY'
 
 # ============================================================================
-# EMAIL CONFIGURATION
+# 🔥 EMAIL CONFIGURATION - SENDGRID (WORKING!)
 # ============================================================================
 
-EMAIL_BACKEND = 'django.core.mail.backends.console.EmailBackend'
-DEFAULT_FROM_EMAIL = 'support@feanefoods.com'
+EMAIL_BACKEND = 'django.core.mail.backends.smtp.EmailBackend'
+EMAIL_HOST = 'smtp.sendgrid.net'
+EMAIL_PORT = 587
+EMAIL_USE_TLS = True
+EMAIL_HOST_USER = 'apikey'
+EMAIL_HOST_PASSWORD = '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'
+DEFAULT_FROM_EMAIL = 'venkateshhegde102@gmail.com'
+
+# ============================================================================
+# 🔥 RAZORPAY PAYMENT CONFIGURATION (TEST MODE)
+# ============================================================================
+
+RAZORPAY_KEY_ID = 'rzp_test_SYlEwi5FcnbrAU'
+RAZORPAY_KEY_SECRET = 'WdcQkcDdGHpE5u4ZP7CGI7IJ'
 
 # ============================================================================
 # LOGGING CONFIGURATION
@@ -206,20 +126,11 @@ LOGGING = {
     'version': 1,
     'disable_existing_loggers': False,
     'formatters': {
-        'verbose': {
-            'format': '{levelname} {asctime} {module} {process:d} {thread:d} {message}',
-            'style': '{',
-        },
-        'simple': {
-            'format': '{levelname} {asctime} {name} {message}',
-            'style': '{',
-        },
+        'verbose': {'format': '{levelname} {asctime} {module} {message}', 'style': '{'},
+        'simple': {'format': '{levelname} {message}', 'style': '{'},
     },
     'handlers': {
-        'console': {
-            'class': 'logging.StreamHandler',
-            'formatter': 'simple',
-        },
+        'console': {'class': 'logging.StreamHandler', 'formatter': 'simple'},
         'file': {
             'class': 'logging.handlers.RotatingFileHandler',
             'filename': BASE_DIR / 'logs' / 'feane.log',
@@ -229,38 +140,31 @@ LOGGING = {
         },
     },
     'loggers': {
-        'django': {
-            'handlers': ['console', 'file'],
-            'level': 'INFO',
-            'propagate': True,
-        },
-        'Base_App': {
-            'handlers': ['console', 'file'],
-            'level': 'DEBUG',
-            'propagate': False,
-        },
+        'django': {'handlers': ['console', 'file'], 'level': 'INFO', 'propagate': True},
+        'Base_App': {'handlers': ['console', 'file'], 'level': 'DEBUG', 'propagate': False},
     },
 }
 
 LOGS_DIR = BASE_DIR / 'logs'
 LOGS_DIR.mkdir(exist_ok=True)
 
-# ============================================================================
-# CACHING
-# ============================================================================
-
 CACHES = {
-    'default': {
-        'BACKEND': 'django.core.cache.backends.locmem.LocMemCache',
-        'LOCATION': 'feane-cache',
-    }
+    'default': {'BACKEND': 'django.core.cache.backends.locmem.LocMemCache', 'LOCATION': 'feane-cache'}
 }
-
-# ============================================================================
-# FILE UPLOAD SETTINGS
-# ============================================================================
 
 FILE_UPLOAD_MAX_MEMORY_SIZE = 5242880
 DATA_UPLOAD_MAX_MEMORY_SIZE = 5242880
-ALLOWED_IMAGE_EXTENSIONS = ['jpg', 'jpeg', 'png', 'gif', 'webp']
-MAX_UPLOAD_SIZE = 5 * 1024 * 1024
+PASSWORD_RESET_TIMEOUT = 3600
+
+# RAZORPAY (MUST BE HERE!)
+RAZORPAY_KEY_ID = 'rzp_test_SYlEwi5FcnbrAU'
+RAZORPAY_KEY_SECRET = 'WdcQkcDdGHpE5u4ZP7CGI7IJ'
+
+# EMAIL (MUST BE HERE!)
+EMAIL_BACKEND = 'django.core.mail.backends.smtp.EmailBackend'
+EMAIL_HOST = 'smtp.sendgrid.net'
+EMAIL_PORT = 587
+EMAIL_USE_TLS = True
+EMAIL_HOST_USER = 'apikey'
+EMAIL_HOST_PASSWORD = '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'
+DEFAULT_FROM_EMAIL = 'venkateshhegde102@gmail.com'
