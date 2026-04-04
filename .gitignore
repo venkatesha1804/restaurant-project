@@ -14,3 +14,10 @@ media/
 # IDE
 .vscode/
 .idea/
+venv/
+env/
+.venv/
+db.sqlite3
+db.sqlite3.bak
+data.json
+media/
