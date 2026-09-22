@@ -4,186 +4,237 @@
 {% block class %}class="sub_page"{% endblock class %}
 {% block main %}
 
-<!-- Login/Signup Section -->
-<section class="book_section layout_padding">
+<section class="book_section layout_padding" style="background: linear-gradient(180deg, #fafafa 0%, #ffffff 100%); min-height: 80vh;">
   <div class="container">
-    <div class="heading_container">
-      <h2>🔐 Account</h2>
-    </div>
 
     {% if messages %}
-      <div class="alert alert-info alert-dismissible fade show" role="alert">
-        {% for message in messages %}
-          <div style="margin-bottom: 10px;">{{ message }}</div>
-        {% endfor %}
-        <button type="button" class="close" data-dismiss="alert" aria-label="Close">
-          <span>&times;</span>
-        </button>
+      <div class="row justify-content-center mb-4">
+        <div class="col-md-8">
+          {% for message in messages %}
+            <div style="background: #fff3cd; border-left: 4px solid #ffbe33; padding: 14px 18px; border-radius: 8px; color: #7a5c00; font-weight: 500; display: flex; justify-content: space-between; align-items: center;">
+              <span>{{ message }}</span>
+            </div>
+          {% endfor %}
+        </div>
       </div>
     {% endif %}
 
-    <div class="row">
-      <!-- Login Form -->
-      <div class="col-md-6" id="login-section">
-        <div class="form_container">
-          <h4 style="margin-bottom: 5px; font-weight: bold;">Welcome Back</h4>
-          <p style="color: #999; margin-bottom: 25px;">Login to your account</p>
+    <div class="row align-items-center justify-content-center" style="min-height: 70vh;">
 
-          <form method="POST" action="{% url 'login' %}" id="login-form">
-            {% csrf_token %}
-            {{ form.non_field_errors }}
+      <!-- LEFT: Auth card -->
+      <div class="col-lg-6 col-md-8 mb-4">
+        <div style="background: #fff; border-radius: 18px; box-shadow: 0 10px 40px rgba(0,0,0,0.08); overflow: hidden; border: 1px solid #f0f0f0;">
 
-            <div>
-              {{ form.username.label_tag }}
-              {{ form.username }}
-              {% for error in form.username.errors %}
-                <div class="text-danger">{{ error }}</div>
-              {% endfor %}
-            </div>
-
-            <div style="margin-top: 15px;">
-              {{ form.password.label_tag }}
-              {{ form.password }}
-              {% for error in form.password.errors %}
-                <div class="text-danger">{{ error }}</div>
-              {% endfor %}
-            </div>
-
-            <div style="margin-top: 15px; margin-bottom: 25px;">
-              <label style="display: flex; align-items: center; cursor: pointer;">
-                <input type="checkbox" name="remember_me" style="margin-right: 10px; cursor: pointer;">
-                <span style="font-size: 14px; color: #666;">Remember me</span>
-              </label>
-            </div>
-
-            <button type="submit" class="btn btn-success" style="width: 100%; padding: 12px; font-size: 16px; font-weight: 600;">
-              🔐 Login to Feane
+          <!-- Tab switcher -->
+          <div style="display: flex; background: #f9f9f9; border-bottom: 1px solid #eee;">
+            <button type="button" id="tab-login" onclick="switchToLogin()" style="flex:1; padding: 18px; border:none; background:#fff; font-weight:700; font-size:15px; color:#222; cursor:pointer; border-bottom: 3px solid #ffbe33; transition: all .2s;">
+              🔐 Login
             </button>
-
-            <p style="text-align: center; margin-top: 15px; font-size: 14px;">
-              <a href="{% url 'password_reset' %}" style="color: #ffbe33; text-decoration: none;">Forgot Password?</a>
-            </p>
-          </form>
-
-          <div style="text-align: center; margin-top: 30px; padding-top: 25px; border-top: 1px solid #eee;">
-            <p style="color: #666; margin-bottom: 10px;">Don't have an account?</p>
-            <button type="button" onclick="switchToSignup()" class="btn btn-outline-secondary" style="width: 100%;">
-              📝 Create New Account
+            <button type="button" id="tab-signup" onclick="switchToSignup()" style="flex:1; padding: 18px; border:none; background:#f9f9f9; font-weight:700; font-size:15px; color:#999; cursor:pointer; border-bottom: 3px solid transparent; transition: all .2s;">
+              📝 Sign Up
             </button>
+          </div>
+
+          <div style="padding: 40px 36px;">
+
+            <!-- LOGIN FORM -->
+            <div id="login-section">
+              <h3 style="font-weight: 800; margin-bottom: 4px; color: #1a1a1a;">Welcome back</h3>
+              <p style="color: #999; margin-bottom: 28px; font-size: 14px;">Login to order your favorites</p>
+
+              <form method="POST" action="{% url 'login' %}" id="login-form">
+                {% csrf_token %}
+                {% if form.non_field_errors %}
+                  <div style="background:#fdecea; color:#b3261e; padding:10px 14px; border-radius:8px; margin-bottom:16px; font-size:14px;">
+                    {{ form.non_field_errors }}
+                  </div>
+                {% endif %}
+
+                <div style="margin-bottom: 18px;">
+                  <label style="font-size: 13px; font-weight: 600; color: #444; margin-bottom: 6px; display:block;">Username</label>
+                  {{ form.username }}
+                  {% for error in form.username.errors %}
+                    <div style="color:#dc3545; font-size:12px; margin-top:4px;">{{ error }}</div>
+                  {% endfor %}
+                </div>
+
+                <div style="margin-bottom: 12px;">
+                  <label style="font-size: 13px; font-weight: 600; color: #444; margin-bottom: 6px; display:block;">Password</label>
+                  {{ form.password }}
+                  {% for error in form.password.errors %}
+                    <div style="color:#dc3545; font-size:12px; margin-top:4px;">{{ error }}</div>
+                  {% endfor %}
+                </div>
+
+                <div style="display:flex; justify-content: space-between; align-items:center; margin-bottom: 24px;">
+                  <label style="display:flex; align-items:center; cursor:pointer; font-size:13px; color:#666; gap:8px;">
+                    <input type="checkbox" name="remember_me" style="cursor:pointer;">
+                    Remember me
+                  </label>
+                  <a href="{% url 'password_reset' %}" style="color:#e08e00; font-size:13px; font-weight:600; text-decoration:none;">Forgot password?</a>
+                </div>
+
+                <button type="submit" style="width:100%; padding:14px; font-size:16px; font-weight:700; background:#ffbe33; color:#1a1a1a; border:none; border-radius:10px; cursor:pointer; transition: background .2s;" onmouseover="this.style.background='#e6a92e'" onmouseout="this.style.background='#ffbe33'">
+                  Login to Feane
+                </button>
+              </form>
+            </div>
+
+            <!-- SIGNUP FORM -->
+            <div id="signup-section" style="display:none;">
+              <h3 style="font-weight: 800; margin-bottom: 4px; color: #1a1a1a;">Create your account</h3>
+              <p style="color: #999; margin-bottom: 28px; font-size: 14px;">Join us for delicious food</p>
+
+              <form method="POST" action="{% url 'signup' %}" id="signup-form">
+                {% csrf_token %}
+                {% if form.non_field_errors %}
+                  <div style="background:#fdecea; color:#b3261e; padding:10px 14px; border-radius:8px; margin-bottom:16px; font-size:14px;">
+                    {{ form.non_field_errors }}
+                  </div>
+                {% endif %}
+
+                <div style="margin-bottom: 16px;">
+                  <label style="font-size: 13px; font-weight: 600; color: #444; margin-bottom: 6px; display:block;">Username</label>
+                  {{ form.username }}
+                  {% for error in form.username.errors %}
+                    <div style="color:#dc3545; font-size:12px; margin-top:4px;">{{ error }}</div>
+                  {% endfor %}
+                </div>
+
+                <div style="margin-bottom: 16px;">
+                  <label style="font-size: 13px; font-weight: 600; color: #444; margin-bottom: 6px; display:block;">Email</label>
+                  {{ form.email }}
+                  {% for error in form.email.errors %}
+                    <div style="color:#dc3545; font-size:12px; margin-top:4px;">{{ error }}</div>
+                  {% endfor %}
+                </div>
+
+                <div style="margin-bottom: 16px;">
+                  <label style="font-size: 13px; font-weight: 600; color: #444; margin-bottom: 6px; display:block;">Password</label>
+                  {{ form.password1 }}
+                  {% for error in form.password1.errors %}
+                    <div style="color:#dc3545; font-size:12px; margin-top:4px;">{{ error }}</div>
+                  {% endfor %}
+                </div>
+
+                <div style="margin-bottom: 24px;">
+                  <label style="font-size: 13px; font-weight: 600; color: #444; margin-bottom: 6px; display:block;">Confirm Password</label>
+                  {{ form.password2 }}
+                  {% for error in form.password2.errors %}
+                    <div style="color:#dc3545; font-size:12px; margin-top:4px;">{{ error }}</div>
+                  {% endfor %}
+                </div>
+
+                <button type="submit" style="width:100%; padding:14px; font-size:16px; font-weight:700; background:#ffbe33; color:#1a1a1a; border:none; border-radius:10px; cursor:pointer; transition: background .2s;" onmouseover="this.style.background='#e6a92e'" onmouseout="this.style.background='#ffbe33'">
+                  Create Account
+                </button>
+              </form>
+            </div>
+
           </div>
         </div>
       </div>
 
-      <!-- Signup Form -->
-      <div class="col-md-6" id="signup-section" style="display: none;">
-        <div class="form_container">
-          <h4 style="margin-bottom: 5px; font-weight: bold;">Create Account</h4>
-          <p style="color: #999; margin-bottom: 25px;">Join us for delicious food</p>
-
-          <form method="POST" action="{% url 'signup' %}" id="signup-form">
-            {% csrf_token %}
-            {{ form.non_field_errors }}
-
-            <div>
-              {{ form.username.label_tag }}
-              {{ form.username }}
-              {% for error in form.username.errors %}
-                <div class="text-danger">{{ error }}</div>
-              {% endfor %}
-            </div>
-
-            <div style="margin-top: 15px;">
-              {{ form.email.label_tag }}
-              {{ form.email }}
-              {% for error in form.email.errors %}
-                <div class="text-danger">{{ error }}</div>
-              {% endfor %}
-            </div>
-
-            <div style="margin-top: 15px;">
-              {{ form.password1.label_tag }}
-              {{ form.password1 }}
-              {% for error in form.password1.errors %}
-                <div class="text-danger">{{ error }}</div>
-              {% endfor %}
-            </div>
-
-            <div style="margin-top: 15px;">
-              {{ form.password2.label_tag }}
-              {{ form.password2 }}
-              {% for error in form.password2.errors %}
-                <div class="text-danger">{{ error }}</div>
-              {% endfor %}
-            </div>
-
-            <button type="submit" class="btn btn-success" style="width: 100%; padding: 12px; font-size: 16px; font-weight: 600;">
-              📝 Create Account
-            </button>
-          </form>
-
-          <div style="text-align: center; margin-top: 30px; padding-top: 25px; border-top: 1px solid #eee;">
-            <p style="color: #666; margin-bottom: 10px;">Already have an account?</p>
-            <button type="button" onclick="switchToLogin()" class="btn btn-outline-secondary" style="width: 100%;">
-              🔐 Login Instead
-            </button>
-          </div>
-        </div>
-      </div>
-
-      <!-- Right Side Info -->
-      <div class="col-md-6" style="display: flex; flex-direction: column; justify-content: center;">
+      <!-- RIGHT: Value props -->
+      <div class="col-lg-5 col-md-8 offset-lg-1">
         <div style="padding: 20px;">
-          <h4 style="margin-bottom: 20px; font-weight: bold;">🍕 Why Create an Account?</h4>
+          <h4 style="font-weight: 800; margin-bottom: 28px; color: #1a1a1a; font-size: 22px;">Why create a Feane account?</h4>
 
-          <div style="margin-bottom: 20px;">
-            <p style="margin: 0; font-weight: 600; color: #333;">✅ Quick Checkout</p>
-            <p style="margin: 5px 0 0 0; color: #999; font-size: 14px;">Save your details for faster ordering</p>
+          <div style="display:flex; gap:16px; margin-bottom: 22px; align-items:flex-start;">
+            <div style="width:44px; height:44px; border-radius:12px; background:#fff3cd; display:flex; align-items:center; justify-content:center; font-size:20px; flex-shrink:0;">⚡</div>
+            <div>
+              <p style="margin:0; font-weight:700; color:#222; font-size:15px;">Quick Checkout</p>
+              <p style="margin:2px 0 0 0; color:#999; font-size:13px;">Save your details for faster ordering</p>
+            </div>
           </div>
 
-          <div style="margin-bottom: 20px;">
-            <p style="margin: 0; font-weight: 600; color: #333;">📦 Track Orders</p>
-            <p style="margin: 5px 0 0 0; color: #999; font-size: 14px;">Monitor your delivery in real-time</p>
+          <div style="display:flex; gap:16px; margin-bottom: 22px; align-items:flex-start;">
+            <div style="width:44px; height:44px; border-radius:12px; background:#d1e7dd; display:flex; align-items:center; justify-content:center; font-size:20px; flex-shrink:0;">📦</div>
+            <div>
+              <p style="margin:0; font-weight:700; color:#222; font-size:15px;">Track Orders</p>
+              <p style="margin:2px 0 0 0; color:#999; font-size:13px;">Monitor your delivery status live</p>
+            </div>
           </div>
 
-          <div style="margin-bottom: 20px;">
-            <p style="margin: 0; font-weight: 600; color: #333;">💰 Exclusive Deals</p>
-            <p style="margin: 5px 0 0 0; color: #999; font-size: 14px;">Get special offers and discounts</p>
+          <div style="display:flex; gap:16px; margin-bottom: 22px; align-items:flex-start;">
+            <div style="width:44px; height:44px; border-radius:12px; background:#cff4fc; display:flex; align-items:center; justify-content:center; font-size:20px; flex-shrink:0;">💰</div>
+            <div>
+              <p style="margin:0; font-weight:700; color:#222; font-size:15px;">Exclusive Deals</p>
+              <p style="margin:2px 0 0 0; color:#999; font-size:13px;">Get special offers and discounts</p>
+            </div>
           </div>
 
-          <div style="margin-bottom: 20px;">
-            <p style="margin: 0; font-weight: 600; color: #333;">❤️ Favorites</p>
-            <p style="margin: 5px 0 0 0; color: #999; font-size: 14px;">Save your favorite meals</p>
+          <div style="display:flex; gap:16px; margin-bottom: 22px; align-items:flex-start;">
+            <div style="width:44px; height:44px; border-radius:12px; background:#f8d7da; display:flex; align-items:center; justify-content:center; font-size:20px; flex-shrink:0;">❤️</div>
+            <div>
+              <p style="margin:0; font-weight:700; color:#222; font-size:15px;">Favorites</p>
+              <p style="margin:2px 0 0 0; color:#999; font-size:13px;">Save meals you love for later</p>
+            </div>
           </div>
 
-          <div style="margin-bottom: 20px;">
-            <p style="margin: 0; font-weight: 600; color: #333;">⭐ Order History</p>
-            <p style="margin: 5px 0 0 0; color: #999; font-size: 14px;">Reorder your favorite items easily</p>
+          <div style="display:flex; gap:16px; margin-bottom: 32px; align-items:flex-start;">
+            <div style="width:44px; height:44px; border-radius:12px; background:#e2d9f3; display:flex; align-items:center; justify-content:center; font-size:20px; flex-shrink:0;">⭐</div>
+            <div>
+              <p style="margin:0; font-weight:700; color:#222; font-size:15px;">Order History</p>
+              <p style="margin:2px 0 0 0; color:#999; font-size:13px;">Reorder your favorites in one tap</p>
+            </div>
           </div>
 
-          <div style="background-color: #f0f7ff; padding: 20px; border-radius: 10px; margin-top: 30px; border-left: 4px solid #667eea;">
-            <p style="margin: 0; font-size: 14px; color: #0066cc;">
-              <strong>🔒 Your data is secure</strong><br>
-              We use industry-leading encryption to protect your information.
+          <div style="background: linear-gradient(135deg, #667eea 0%, #764ba2 100%); padding: 20px; border-radius: 14px; color:#fff;">
+            <p style="margin: 0; font-size: 14px; line-height: 1.5;">
+              🔒 <strong>Your data is secure</strong><br>
+              <span style="opacity:.9;">We use industry-leading encryption to protect your information.</span>
             </p>
           </div>
         </div>
       </div>
+
     </div>
   </div>
 </section>
+
+<style>
+  #login-section input, #signup-section input {
+    width: 100%;
+    padding: 12px 14px;
+    border: 1.5px solid #e5e5e5;
+    border-radius: 10px;
+    font-size: 14px;
+    transition: border-color .2s;
+  }
+  #login-section input:focus, #signup-section input:focus {
+    outline: none;
+    border-color: #ffbe33;
+    box-shadow: 0 0 0 3px rgba(255, 190, 51, 0.15);
+  }
+</style>
 
 <script>
   function switchToSignup() {
     document.getElementById('login-section').style.display = 'none';
     document.getElementById('signup-section').style.display = 'block';
-    window.scrollTo(0, 0);
+    document.getElementById('tab-login').style.background = '#f9f9f9';
+    document.getElementById('tab-login').style.color = '#999';
+    document.getElementById('tab-login').style.borderBottomColor = 'transparent';
+    document.getElementById('tab-signup').style.background = '#fff';
+    document.getElementById('tab-signup').style.color = '#222';
+    document.getElementById('tab-signup').style.borderBottomColor = '#ffbe33';
   }
 
   function switchToLogin() {
-    document.getElementById('login-section').style.display = 'block';
     document.getElementById('signup-section').style.display = 'none';
-    window.scrollTo(0, 0);
+    document.getElementById('login-section').style.display = 'block';
+    document.getElementById('tab-signup').style.background = '#f9f9f9';
+    document.getElementById('tab-signup').style.color = '#999';
+    document.getElementById('tab-signup').style.borderBottomColor = 'transparent';
+    document.getElementById('tab-login').style.background = '#fff';
+    document.getElementById('tab-login').style.color = '#222';
+    document.getElementById('tab-login').style.borderBottomColor = '#ffbe33';
   }
+
+  {% if is_signup %}
+    switchToSignup();
+  {% endif %}
 </script>
 
 {% endblock main %}

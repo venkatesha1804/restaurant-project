@@ -55,7 +55,7 @@
                       </div>
                     </td>
                     <td>
-                      <strong>${{ cart_item.item.price }}</strong>
+                      <strong>₹{{cart_item.item.price }}</strong>
                     </td>
                     <td>
                       <div style="display: flex; align-items: center; gap: 5px;">
@@ -75,7 +75,7 @@
                       </div>
                     </td>
                     <td>
-                      <strong id="subtotal-{{ cart_item.item.id }}">${{ cart_item.get_subtotal }}</strong>
+                      <strong id="subtotal-{{ cart_item.item.id }}">₹{{cart_item.get_subtotal }}</strong>
                     </td>
                     <td>
                       <button class="btn btn-sm btn-danger remove-item" 
@@ -103,7 +103,7 @@
 
               <div style="display: flex; justify-content: space-between; margin-bottom: 15px; border-bottom: 1px solid #eee; padding-bottom: 10px;">
                 <span>Subtotal:</span>
-                <strong id="subtotal-total">${{ total_price }}</strong>
+                <strong id="subtotal-total">₹{{ total_price }}</strong>
               </div>
 
               <div style="display: flex; justify-content: space-between; margin-bottom: 15px; border-bottom: 1px solid #eee; padding-bottom: 10px;">
@@ -113,7 +113,7 @@
 
               <div style="display: flex; justify-content: space-between; margin-bottom: 20px; font-size: 18px;">
                 <span style="font-weight: bold;">Total:</span>
-                <strong style="color: #ffbe33;" id="grand-total">${{ total_price }}</strong>
+                <strong style="color: #ffbe33;" id="grand-total">₹{{ total_price }}</strong>
               </div>
 
             <a href="{% url 'checkout' %}" class="btn btn-success" style="width: 100%; padding: 12px; font-size: 16px; display: block; text-align: center; text-decoration: none; margin-bottom: 10px;">

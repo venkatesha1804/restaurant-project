@@ -47,15 +47,15 @@
                         </div>
                         
                         <div class="col-md-8">
-                            {% for stars, count in rating_breakdown.items %}
-                                <div class="d-flex align-items-center mb-2">
-                                    <small class="w-25">{{ stars }}★</small>
-                                    <div class="progress flex-grow-1 mx-2" style="height: 20px;">
-                                        <div class="progress-bar bg-warning" style="width: {% if rating_count %}{{ count|add:0|mul:100|div:rating_count|floatformat:0 }}%{% endif %}"></div>
-                                    </div>
-                                    <small class="w-25 text-end">{{ count }}</small>
-                                </div>
-                            {% endfor %}
+                            {% for stars, data in rating_breakdown.items %}
+    <div class="d-flex align-items-center mb-2">
+        <small class="w-25">{{ stars }}★</small>
+        <div class="progress flex-grow-1 mx-2" style="height: 20px;">
+            <div class="progress-bar bg-warning" style="width: {{ data.pct }}%"></div>
+        </div>
+        <small class="w-25 text-end">{{ data.count }}</small>
+    </div>
+{% endfor %}
                         </div>
                     </div>
                 </div>

@@ -141,10 +141,10 @@
                       <strong>{{ item.quantity }}</strong>
                     </td>
                     <td style="text-align: right; padding: 15px;">
-                      <strong>${{ item.price_at_purchase }}</strong>
+                      <strong>₹{{ item.price_at_purchase }}</strong>
                     </td>
                     <td style="text-align: right; padding: 15px;">
-                      <strong style="color: #ffbe33;">${{ item.subtotal }}</strong>
+                      <strong style="color: #ffbe33;">₹{{ item.subtotal }}</strong>
                     </td>
                   </tr>
                   {% endfor %}
@@ -178,7 +178,7 @@
             <div style="margin-bottom: 15px; padding-bottom: 10px; border-bottom: 1px solid #eee;">
               <div style="display: flex; justify-content: space-between; margin-bottom: 8px;">
                 <span>Subtotal:</span>
-                <strong>${{ order.total_amount }}</strong>
+                <strong>₹{{ order.total_amount }}</strong>
               </div>
               <div style="display: flex; justify-content: space-between; margin-bottom: 8px;">
                 <span>Delivery:</span>
@@ -192,7 +192,7 @@
 
             <div style="display: flex; justify-content: space-between; font-size: 18px; margin-bottom: 20px;">
               <span style="font-weight: bold;">Total:</span>
-              <strong style="color: #ffbe33; font-size: 20px;">${{ order.total_amount }}</strong>
+              <strong style="color: #ffbe33; font-size: 20px;">₹{{ order.total_amount }}</strong>
             </div>
 
             <!-- Order Status Badge -->
@@ -273,7 +273,7 @@
               </p>
               <p style="margin: 8px 0; font-size: 13px;">
                 <strong>Average Item Price:</strong><br>
-                ${{ order.total_amount|add:0|floatformat:2 }}
+                ₹{{ order.total_amount|add:0|floatformat:2 }}
               </p>
             </div>
           </div>

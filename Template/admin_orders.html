@@ -67,7 +67,7 @@
         <div class="col-md-6">
           <div class="card" style="border: 1px solid #ddd; border-radius: 10px; padding: 20px; background-color: #f0f7ff;">
             <h5 style="margin: 0; color: #0066cc; font-weight: bold;">💰 Total Revenue</h5>
-            <h2 style="margin: 10px 0 0 0; color: #0066cc; font-size: 32px;">${{ total_revenue|floatformat:2 }}</h2>
+            <h2 style="margin: 10px 0 0 0; color: #0066cc; font-size: 32px;">₹{{total_revenue|floatformat:2 }}</h2>
             <p style="margin: 5px 0 0 0; font-size: 12px; color: #0066cc;">From all delivered orders</p>
           </div>
         </div>
@@ -136,7 +136,7 @@
                 <span class="badge" style="background-color: #e9ecef; color: #333; padding: 5px 10px;">{{ order.get_total_items }} items</span>
               </td>
               <td>
-                <strong style="color: #ffbe33; font-size: 16px;">${{ order.total_amount }}</strong>
+                <strong style="color: #ffbe33; font-size: 16px;">₹{{ order.total_amount }}</strong>
               </td>
               <td>
                 <select class="form-control status-select" data-order-id="{{ order.id }}" style="padding: 5px; font-size: 12px; border-radius: 5px;

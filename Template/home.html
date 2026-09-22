@@ -19,11 +19,9 @@
                     </h1>
                     <p>
 Welcome to our fast food hub where good food meets great vibes. We’re serving up your favorites burgers, fries, wraps, and more all in a space designed to feel fresh, fun, and totally you. Whether you're here to chill with friends or grab a quick bite, we’ve created an experience that’s fast, flavorful, and full of energy. It's not just a meal it's a mood.                    </p>
-                    {% comment %} <div class="btn-box">
-                      <a href="" class="btn1">
-                        Order Now
-                      </a>
-                    </div> {% endcomment %}
+                    <div class="btn-box" style="margin-top: 10px;">
+  <a href="{% url 'Menu' %}" class="btn1">Order Now →</a>
+</div>
                   </div>
                 </div>
               </div>
@@ -255,43 +253,93 @@ Welcome to our fast food hub where good food meets great vibes. We’re serving 
       </div>
 
       <ul class="filters_menu">
-        <li class="active" data-filter="*">All</li>
-        {% for i in list %}
-        <li data-filter=".{{i.Category_name}}">{{i.Category_name}}</li>
-        {% endfor %}
-      </ul>
 
-      <div class="filters-content">
-        <div class="row grid">
-          {% for j in items %}
-          <div class="col-sm-6 col-lg-4 all {{j.Category}}">
-            <div class="box">
-              <div>
-                <div class="img-box">
-                  <img src="/media/{{j.Image}} " alt="{{j.Image}}">
+    <li class="active" data-filter="*">
+        All
+    </li>
+
+    {% for category in categories %}
+
+        <li data-filter=".{{ category.category_name|slugify }}">
+            {{ category.category_name }}
+        </li>
+
+    {% endfor %}
+
+</ul>
+
+<div class="filters-content">
+
+    <div class="row grid">
+
+        {% for item in items %}
+
+            <div class="col-sm-6 col-lg-4 all {{ item.category.category_name|slugify }}">
+
+                <div class="box">
+
+                    <div>
+
+                        <div class="img-box">
+
+                            {% if item.image %}
+                                <img
+                                    src="{{ item.image.url }}"
+                                    alt="{{ item.item_name }}"
+                                >
+                            {% endif %}
+
+                        </div>
+
+                        <div class="detail-box">
+
+                            <h5>
+                                {{ item.item_name }}
+                            </h5>
+
+                            <p>
+                                {{ item.description }}
+                            </p>
+
+                            <div class="options">
+
+                                <h6>
+                                    ₹{{ item.price }}
+                                </h6>
+
+                                <button
+                                    type="button"
+                                    class="btn btn-success add-to-cart"
+                                    data-item-id="{{ item.id }}"
+                                    data-item-name="{{ item.item_name }}"
+                                    data-item-price="{{ item.price }}"
+                                >
+                                    Add to Cart
+                                </button>
+
+                            </div>
+
+                        </div>
+
+                    </div>
+
                 </div>
-                <div class="detail-box">
-                  <h5>
-                    {{j.Item_name}}
-                  </h5>
-                  <p>
-                    {{j.description}}
-                  </p>
-                  <div class="options">
-                    <h6>
-                      ${{j.Price}}
-                    </h6>
-                    <button class="btn btn-success add-to-cart" data-item-id="{{j.id}}" data-item-name="{{j.Item_name}}" data-item-price="{{j.Price}}">
-                      Add to Cart
-                    </button>
-                  </div>
-                </div>
-              </div>
+
             </div>
-          </div>
-          {% endfor %}
-        </div>
-      </div>
+
+        {% empty %}
+
+            <div class="col-12">
+                <p class="text-center">
+                    No menu items available right now.
+                </p>
+            </div>
+
+        {% endfor %}
+
+    </div>
+
+</div>
       <div class="btn-box">
         <a href="">
           View More
@@ -365,70 +413,97 @@ Welcome to our fast food hub where good food meets great vibes. We’re serving 
 
   <!-- client section -->
 
-  <section class="client_section layout_padding-bottom">
+  <!-- client section -->
+<section class="client_section layout_padding-bottom">
     <div class="container">
-      <div class="heading_container heading_center psudo_white_primary mb_45">
-        <h2>
-          What Says Our Customers
-        </h2>
-      </div>
-      
-      <div class="carousel-wrap row ">
-        <div class="owl-carousel client_owl-carousel">
-          {% for k in review %}
-          <div class="item">
-            <div class="box">
-              <div class="detail-box">
-                <p>
-                  {{k.Description}}
-                </p>
-                <h6>
-                  {{k.User_name}}
-                </h6>
-                <p>
-                  Rating : {{k.Rating}}/5w
-                </p>
-              </div>
-              <div class="img-box">
-                <img src="/media/{{k.Image}}" alt="{{k.Image}}" class="box-img">
-              </div>
-            </div>
-          </div>
-          {% endfor %}
-        </div>
-      </div>
-      
-    </div>
-  </section>
 
+        <div class="heading_container heading_center psudo_white_primary mb_45">
+            <h2>
+                What Says Our Customers
+            </h2>
+        </div>
+
+        <div class="carousel-wrap row">
+            <div class="owl-carousel client_owl-carousel">
+
+                {% for k in reviews %}
+
+                <div class="item">
+                    <div class="box">
+
+                        <div class="detail-box">
+
+                            <p>
+                                {{ k.description }}
+                            </p>
+
+                            <h6>
+                                {{ k.user_name }}
+                            </h6>
+
+                            <p>
+                                Rating: {{ k.rating }}/5
+                            </p>
+
+                        </div>
+
+                        <div class="img-box">
+                            {% if k.image %}
+                                <img
+                                    src="{{ k.image.url }}"
+                                    alt="{{ k.user_name }}"
+                                    class="box-img"
+                                >
+                            {% endif %}
+                        </div>
+
+                    </div>
+                </div>
+
+                {% empty %}
+
+                <div class="item">
+                    <div class="box">
+                        <div class="detail-box">
+                            <p>
+                                No customer reviews yet.
+                            </p>
+                            <h6>
+                                Be the first to share your experience!
+                            </h6>
+                        </div>
+                    </div>
+                </div>
+
+                {% endfor %}
+
+            </div>
+        </div>
+
+    </div>
+</section>
+<!-- end client section -->
   <!-- end client section -->
 
-  <script>
-    document.querySelectorAll('.add-to-cart').forEach(button => {
-      button.addEventListener('click', function() {
-        const itemId = this.getAttribute('data-item-id');
-        const itemName = this.getAttribute('data-item-name');
-        const itemPrice = this.getAttribute('data-item-price');
+ <script>
+document.querySelectorAll('.add-to-cart').forEach(button => {
+  button.addEventListener('click', function() {
+    const itemId = this.getAttribute('data-item-id');
+    fetch(`/add-to-cart/${itemId}/`, {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/x-www-form-urlencoded',
+        'X-CSRFtoken': '{{ csrf_token }}'
+      },
+      body: 'quantity=1'
+    })
+    .then(response => response.json())
+    .then(data => {
+      alert(data.message || (data.success ? '✓ Added to cart' : '✗ Failed'));
+    })
+    .catch(error => console.error('Error:', error));
+  });
+});
+</script>
   
-        fetch('/add-to-cart/', {
-          method: 'POST',
-          headers: {
-            'Content-Type': 'application/x-www-form-urlencoded',
-            'X-CSRFTOKEN': '{{ csrf_token }}'
-          },
-          body: item_id=${itemId}
-        })
-        .then(response => response.json())
-        .then(data => {
-          if (data.message) {
-            alert(data.message);
-          } else {
-            alert('Failed to add item to cart.');
-          }
-        })
-        .catch(error => console.error('Error:', error));
-      });
-    });
-  </script>
-  
-{% endblock main %}
+{% endblock main %} 

@@ -8,6 +8,7 @@
   <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no" />
   <link rel="shortcut icon" href="{% static 'images/favicon.png' %}" type="">
   <title>Feane</title>
+  <link href="https://fonts.googleapis.com/css2?family=Pacifico&display=swap" rel="stylesheet">
 
   <!-- Styles -->
   <link rel="stylesheet" type="text/css" href="{% static 'css/bootstrap.css' %}" />
@@ -48,11 +49,11 @@
             <li>
               <a class="nav-link" href="{% url 'Feedback_Form' %}" style="color: #ffffff; text-transform: uppercase; font-size: 14px; padding: 5px 20px; transition: all 0.3s;">Feedback</a>
             </li>
-            {% if user.is_authenticated %}
-            <li>
-              <a class="nav-link" href="{% url 'admin_dashboard' %}" style="color: #ffffff; text-transform: uppercase; font-size: 14px; padding: 5px 20px; transition: all 0.3s;">Dashboard</a>
-            </li>
-            {% endif %}
+            {% if user.is_staff or user.is_superuser %}
+<li>
+  <a class="nav-link" href="{% url 'admin_dashboard' %}" style="color: #ffffff; text-transform: uppercase; font-size: 14px; padding: 5px 20px; transition: all 0.3s;">Dashboard</a>
+</li>
+{% endif %}
           </ul>
 
           <!-- Login / Logout / Cart Section -->

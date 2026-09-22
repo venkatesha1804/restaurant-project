@@ -102,21 +102,47 @@
                   <div style="display: flex; justify-content: space-between; margin-bottom: 8px; padding-bottom: 8px; border-bottom: 1px solid #eee;">
                     <div style="flex: 1;">
                       <p style="margin: 0; font-size: 13px;"><strong>{{ item.item.item_name }}</strong></p>
-                      <p style="margin: 2px 0 0 0; font-size: 12px; color: #999;">{{ item.quantity }} × ${{ item.price_at_purchase }}</p>
+                      <p style="margin: 2px 0 0 0; font-size: 12px; color: #999;">{{ item.quantity }} × ₹{{ item.price_at_purchase }}</p>
                     </div>
                     <div style="text-align: right;">
-                      <p style="margin: 0; font-weight: 600; font-size: 13px;">${{ item.subtotal }}</p>
+                      <p style="margin: 0; font-weight: 600; font-size: 13px;">₹{{ item.subtotal }}</p>
                     </div>
                   </div>
                   {% endfor %}
                 </div>
               </div>
 
-              <!-- Order Total -->
-              <div style="display: flex; justify-content: space-between; margin-bottom: 15px; padding: 15px; background-color: #f0f7ff; border-radius: 5px;">
-                <span style="font-weight: 600;">Total Amount:</span>
-                <span style="font-weight: 700; color: #ffbe33; font-size: 16px;">${{ order.total_amount }}</span>
-              </div>
+             <!-- Order Total -->
+<div style="margin-bottom: 15px; padding: 15px; background-color: #f0f7ff; border-radius: 5px;">
+
+  {% if order.discount_amount > 0 %}
+
+    <div style="display: flex; justify-content: space-between; margin-bottom: 8px;">
+      <span style="font-weight: 600;">Item Total:</span>
+      <span style="font-weight: 600;">
+        ₹{{ order.total_amount|add:order.discount_amount|floatformat:2 }}
+      </span>
+    </div>
+
+    <div style="display: flex; justify-content: space-between; margin-bottom: 8px; color: #28a745;">
+      <span style="font-weight: 600;">
+        Coupon ({{ order.coupon_code }}):
+      </span>
+      <span style="font-weight: 600;">
+        -₹{{ order.discount_amount|floatformat:2 }}
+      </span>
+    </div>
+
+  {% endif %}
+
+  <div style="display: flex; justify-content: space-between;">
+    <span style="font-weight: 700;">Total Amount:</span>
+    <span style="font-weight: 700; color: #ffbe33; font-size: 16px;">
+      ₹{{ order.total_amount|floatformat:2 }}
+    </span>
+  </div>
+
+</div>
 
               <!-- Special Requests -->
               {% if order.special_requests %}
@@ -131,11 +157,15 @@
                 <a href="{% url 'order_detail' order.id %}" class="btn btn-primary" style="flex: 1; padding: 10px; text-align: center; text-decoration: none; border-radius: 5px;">
                   View Details
                 </a>
-                {% if order.status != 'cancelled' and order.status != 'delivered' %}
-                <button class="btn btn-outline-danger" style="flex: 1; padding: 10px; border-radius: 5px;" disabled title="Contact support to cancel">
-                  Cancel Order
-                </button>
-                {% endif %}
+                {% if order.can_be_cancelled %}
+<button
+    type="button"
+    class="btn btn-outline-danger cancel-order-btn"
+    data-order-id="{{ order.id }}"
+    style="flex: 1; padding: 10px; border-radius: 5px;">
+    Cancel Order
+</button>
+{% endif %}
               </div>
             </div>
           </div>
@@ -156,5 +186,32 @@
 
     </div>
   </section>
+
+
+  <script>
+document.querySelectorAll('.cancel-order-btn').forEach(btn => {
+    btn.addEventListener('click', function() {
+        if (!confirm('Cancel this order?')) {
+            return;
+        }
+
+        fetch(`/order/${this.dataset.orderId}/cancel/`, {
+            method: 'POST',
+            headers: {
+                'X-CSRFToken': '{{ csrf_token }}'
+            }
+        })
+        .then(response => response.json())
+        .then(data => {
+            alert(data.message);
+            location.reload();
+        })
+        .catch(error => {
+            console.error('Cancellation error:', error);
+            alert('Something went wrong while cancelling the order.');
+        });
+    });
+});
+</script>
 
 {% endblock main %}

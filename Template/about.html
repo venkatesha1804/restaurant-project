@@ -1,47 +1,107 @@
 {% extends "base.html" %}
-
 {% load static %}
-{% block class %}class="sub_page"{% endblock class %}
 
+{% block class %}class="sub_page"{% endblock class %}
 {% block about_status %}active{% endblock about_status %}
 
 {% block main %}
 
-  <!-- about section -->
-
-  <section class="about_section layout_padding">
-    <div class="container  ">
-
-      <div class="row">
-        <div class="col-md-6 ">
-          <div class="img-box">
-            <img src="{% static 'images/about-img.png' %} " alt="">
-          </div>
+<!-- HERO -->
+<section class="about_section layout_padding" style="background: #0d0d0d; padding: 70px 0;">
+  <div class="container">
+    <div class="row align-items-center">
+      <div class="col-md-6">
+        <div class="img-box" style="text-align:center;">
+          <img src="{% static 'images/about-img.png' %}" alt="Feane" style="max-width: 90%;">
         </div>
-        <div class="col-md-6">
-          <div class="detail-box">
-            <div class="heading_container">
-              <h2>
-                We Are Feane
-              </h2>
+      </div>
+      <div class="col-md-6">
+        <div class="detail-box" style="color:#fff;">
+          <h2 style="font-family: 'Pacifico', cursive; font-size: 42px; color:#fff; margin-bottom: 20px;">
+            We Are Feane
+          </h2>
+
+          <p style="color:#c9c9c9; font-size:15px; line-height:1.8; margin-bottom:18px;">
+            Feane started with one simple idea — food should feel like a celebration, not a chore.
+            What began as a small kitchen experiment has grown into a fast-food destination known for
+            bold flavors, honest ingredients, and a vibe that keeps people coming back.
+          </p>
+
+          <p style="color:#c9c9c9; font-size:15px; line-height:1.8; margin-bottom:28px;">
+            From woodfire pizzas to signature burgers, every dish on our menu is built to be shared,
+            savored, and remembered. Whether you're grabbing a quick bite between meetings or settling
+            in with friends for the night, Feane is where fast food meets feel-good.
+          </p>
+
+          <a href="{% url 'Book_Table' %}" style="display:inline-block; padding: 14px 32px; background:#ffbe33; color:#1a1a1a; font-weight:700; border-radius:8px; text-decoration:none; transition: all .2s;" onmouseover="this.style.opacity='0.85'" onmouseout="this.style.opacity='1'">
+            Book a Table →
+          </a>
+
+          {% if data.description %}
+            <div style="margin-top: 28px; padding-top: 24px; border-top: 1px solid #2a2a2a; color:#c9c9c9; font-size:14px; line-height:1.7;">
+              {{ data.description|linebreaksbr }}
             </div>
-           
-              
-              <div>
-                <p>
-                {% for i in data %}
-                {{ i.Description|safe }}
-                {% endfor %}
-              </p>
-             </div>
-             
-           
-          </div>
+          {% endif %}
         </div>
       </div>
     </div>
-  </section>
+  </div>
+</section>
 
-  <!-- end about section -->
+<!-- STATS STRIP -->
+<section style="background:#141414; padding: 50px 0; border-top: 1px solid #222; border-bottom: 1px solid #222;">
+  <div class="container">
+    <div class="row text-center">
+      <div class="col-6 col-md-3 mb-4 mb-md-0">
+        <h3 style="color:#ffbe33; font-size:34px; font-weight:800; margin-bottom:4px;">5+</h3>
+        <p style="color:#999; font-size:13px; text-transform:uppercase; letter-spacing:1px; margin:0;">Years Serving</p>
+      </div>
+      <div class="col-6 col-md-3 mb-4 mb-md-0">
+        <h3 style="color:#ffbe33; font-size:34px; font-weight:800; margin-bottom:4px;">50+</h3>
+        <p style="color:#999; font-size:13px; text-transform:uppercase; letter-spacing:1px; margin:0;">Menu Items</p>
+      </div>
+      <div class="col-6 col-md-3">
+        <h3 style="color:#ffbe33; font-size:34px; font-weight:800; margin-bottom:4px;">10k+</h3>
+        <p style="color:#999; font-size:13px; text-transform:uppercase; letter-spacing:1px; margin:0;">Orders Served</p>
+      </div>
+      <div class="col-6 col-md-3">
+        <h3 style="color:#ffbe33; font-size:34px; font-weight:800; margin-bottom:4px;">4.8★</h3>
+        <p style="color:#999; font-size:13px; text-transform:uppercase; letter-spacing:1px; margin:0;">Average Rating</p>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- WHAT WE STAND FOR -->
+<section style="background:#0d0d0d; padding: 70px 0;">
+  <div class="container">
+    <div class="text-center mb-5">
+      <h2 style="color:#fff; font-family:'Pacifico', cursive; font-size:32px;">What We Stand For</h2>
+    </div>
+    <div class="row">
+      <div class="col-md-4 mb-4">
+        <div style="background:#161616; border:1px solid #232323; border-radius:14px; padding:32px 24px; text-align:center; height:100%;">
+          <div style="font-size:36px; margin-bottom:16px;">🌿</div>
+          <h5 style="color:#fff; font-weight:700; margin-bottom:10px;">Fresh Ingredients</h5>
+          <p style="color:#999; font-size:14px; line-height:1.6; margin:0;">Sourced daily, never frozen where it matters — quality you can taste in every bite.</p>
+        </div>
+      </div>
+      <div class="col-md-4 mb-4">
+        <div style="background:#161616; border:1px solid #232323; border-radius:14px; padding:32px 24px; text-align:center; height:100%;">
+          <div style="font-size:36px; margin-bottom:16px;">⚡</div>
+          <h5 style="color:#fff; font-weight:700; margin-bottom:10px;">Fast, Not Rushed</h5>
+          <p style="color:#999; font-size:14px; line-height:1.6; margin:0;">Speed without sacrificing care — your order is ready fast because we plan ahead, not cut corners.</p>
+        </div>
+      </div>
+      <div class="col-md-4 mb-4">
+        <div style="background:#161616; border:1px solid #232323; border-radius:14px; padding:32px 24px; text-align:center; height:100%;">
+          <div style="font-size:36px; margin-bottom:16px;">❤️</div>
+          <h5 style="color:#fff; font-weight:700; margin-bottom:10px;">Made With Care</h5>
+          <p style="color:#999; font-size:14px; line-height:1.6; margin:0;">Every dish is plated like it's for someone we know — because to us, every customer is.</p>
+        </div>
+      </div>
+    </div>
+  </div>
+</section>
 
 {% endblock main %}

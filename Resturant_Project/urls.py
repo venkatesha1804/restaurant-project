@@ -1,5 +1,6 @@
 from django.contrib import admin
 from django.urls import path
+from Base_App.views import health_check
 from django.contrib.auth import views as auth_views
 from Base_App.views import (
     HomeView, 
@@ -23,6 +24,7 @@ from Base_App.views import (
     order_confirmation,
     order_history,
     order_detail,
+    download_invoice,
     update_order_status,
     admin_orders,
     admin_order_detail,
@@ -34,6 +36,8 @@ from Base_App.views import (
     create_payment,
     payment_success,
     add_to_wishlist,
+    cancel_order,
+
     my_wishlist,
     apply_coupon,
     submit_order_review,
@@ -41,6 +45,10 @@ from Base_App.views import (
 )
 
 urlpatterns = [
+    # your existing paths...
+
+    path('health/', health_check, name='health_check'),
+
     path('admin/', admin.site.urls),
     
     path('', HomeView, name="Home"),
@@ -68,6 +76,15 @@ urlpatterns = [
     path('order/confirmation/<int:order_id>/', order_confirmation, name='order_confirmation'),
     path('order/history/', order_history, name='order_history'),
     path('order/<int:order_id>/', order_detail, name='order_detail'),
+    path('order/<int:order_id>/invoice/',
+    download_invoice,
+    name='download_invoice'),
+    path(
+    'order/<int:order_id>/cancel/',
+    cancel_order,
+    name='cancel_order'
+),
+
     path('order/<int:order_id>/update-status/', update_order_status, name='update_order_status'),
     
     path('payment/<int:order_id>/', create_payment, name='create_payment'),

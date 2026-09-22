@@ -9,10 +9,14 @@ import dj_database_url
 
 BASE_DIR = Path(__file__).resolve().parent.parent
 
-SECRET_KEY = config('SECRET_KEY', default='django-insecure-t_!n%3ph(-bpkd2+z2!zujx+6r_x%&3%allmra#8#x0v*iogzf')
-DEBUG = config('DEBUG', default=True, cast=bool)
-ALLOWED_HOSTS = ['localhost', '127.0.0.1']
+SECRET_KEY = config(
+    'SECRET_KEY')
 
+DEBUG = config('DEBUG', default=False, cast=bool)
+ALLOWED_HOSTS = config(
+    'ALLOWED_HOSTS',
+    default='localhost,127.0.0.1'
+).split(',')
 INSTALLED_APPS = [
     'django.contrib.admin',
     'django.contrib.auth',
@@ -25,6 +29,7 @@ INSTALLED_APPS = [
 
 MIDDLEWARE = [
     'django.middleware.security.SecurityMiddleware',
+    'whitenoise.middleware.WhiteNoiseMiddleware',
     'django.contrib.sessions.middleware.SessionMiddleware',
     'django.middleware.common.CommonMiddleware',
     'django.middleware.csrf.CsrfViewMiddleware',
@@ -54,10 +59,10 @@ TEMPLATES = [
 WSGI_APPLICATION = 'Resturant_Project.wsgi.application'
 
 DATABASES = {
-    'default': {
-        'ENGINE': 'django.db.backends.sqlite3',
-        'NAME': BASE_DIR / 'db.sqlite3',
-    }
+    'default': dj_database_url.config(
+        default=f'sqlite:///{BASE_DIR / "db.sqlite3"}',
+        conn_max_age=600,
+    )
 }
 
 AUTH_PASSWORD_VALIDATORS = [
@@ -74,10 +79,11 @@ USE_TZ = True
 
 STATIC_URL = '/static/'
 STATIC_ROOT = BASE_DIR / 'staticfiles'
-STATICFILES_DIRS = [BASE_DIR / 'static']
+STATICFILES_DIRS = [BASE_DIR / 'Static']
+STATICFILES_STORAGE = 'whitenoise.storage.CompressedManifestStaticFilesStorage'
 
 MEDIA_URL = '/media/'
-MEDIA_ROOT = BASE_DIR / 'media'
+MEDIA_ROOT = BASE_DIR / 'Media'
 
 DEFAULT_AUTO_FIELD = 'django.db.models.BigAutoField'
 
@@ -87,14 +93,22 @@ LOGOUT_REDIRECT_URL = 'Home'
 
 SESSION_ENGINE = 'django.contrib.sessions.backends.db'
 SESSION_COOKIE_AGE = 1209600
+# HTTPS security settings
+SECURE_SSL_REDIRECT = not DEBUG
+SECURE_HSTS_SECONDS = 31536000
+SECURE_HSTS_INCLUDE_SUBDOMAINS = True
+SECURE_HSTS_PRELOAD = True
 SESSION_COOKIE_HTTPONLY = True
-SESSION_COOKIE_SECURE = False
+SESSION_COOKIE_SECURE = not DEBUG
 SESSION_COOKIE_SAMESITE = 'Lax'
 
 CSRF_COOKIE_HTTPONLY = True
-CSRF_COOKIE_SECURE = False
+CSRF_COOKIE_SECURE = not DEBUG
 CSRF_COOKIE_SAMESITE = 'Lax'
-CSRF_TRUSTED_ORIGINS = ['http://localhost:8000', 'http://127.0.0.1:8000']
+CSRF_TRUSTED_ORIGINS = config(
+    'CSRF_TRUSTED_ORIGINS',
+    default='http://localhost:8000,http://127.0.0.1:8000'
+).split(',')
 
 SECURE_BROWSER_XSS_FILTER = True
 X_FRAME_OPTIONS = 'DENY'
@@ -104,19 +118,15 @@ X_FRAME_OPTIONS = 'DENY'
 # ============================================================================
 
 EMAIL_BACKEND = 'django.core.mail.backends.smtp.EmailBackend'
-EMAIL_HOST = 'smtp.sendgrid.net'
-EMAIL_PORT = 587
+EMAIL_HOST = config('BREVO_SMTP_HOST')
+EMAIL_PORT = config('BREVO_SMTP_PORT', cast=int)
 EMAIL_USE_TLS = True
-EMAIL_HOST_USER = 'apikey'
-EMAIL_HOST_PASSWORD = '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'
-DEFAULT_FROM_EMAIL = 'venkateshhegde102@gmail.com'
+EMAIL_HOST_USER = config('BREVO_SMTP_LOGIN')
+EMAIL_HOST_PASSWORD = config('BREVO_SMTP_KEY')
+DEFAULT_FROM_EMAIL = config('DEFAULT_FROM_EMAIL')
 
-# ============================================================================
-# 🔥 RAZORPAY PAYMENT CONFIGURATION (TEST MODE)
-# ============================================================================
-
-RAZORPAY_KEY_ID = 'rzp_test_SYlEwi5FcnbrAU'
-RAZORPAY_KEY_SECRET = 'WdcQkcDdGHpE5u4ZP7CGI7IJ'
+RAZORPAY_KEY_ID = config('RAZORPAY_KEY_ID')
+RAZORPAY_KEY_SECRET = config('RAZORPAY_KEY_SECRET')
 
 # ============================================================================
 # LOGGING CONFIGURATION
@@ -156,15 +166,3 @@ FILE_UPLOAD_MAX_MEMORY_SIZE = 5242880
 DATA_UPLOAD_MAX_MEMORY_SIZE = 5242880
 PASSWORD_RESET_TIMEOUT = 3600
 
-# RAZORPAY (MUST BE HERE!)
-RAZORPAY_KEY_ID = 'rzp_test_SYlEwi5FcnbrAU'
-RAZORPAY_KEY_SECRET = 'WdcQkcDdGHpE5u4ZP7CGI7IJ'
-
-# EMAIL (MUST BE HERE!)
-EMAIL_BACKEND = 'django.core.mail.backends.smtp.EmailBackend'
-EMAIL_HOST = 'smtp.sendgrid.net'
-EMAIL_PORT = 587
-EMAIL_USE_TLS = True
-EMAIL_HOST_USER = 'apikey'
-EMAIL_HOST_PASSWORD = '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'
-DEFAULT_FROM_EMAIL = 'venkateshhegde102@gmail.com'

@@ -48,6 +48,51 @@
     </div>
 
     <!-- Menu Management Section -->
+
+
+
+        <!-- Admin Analytics -->
+    <div class="row mt-4">
+        <div class="col-md-6">
+            <div class="card">
+                <div class="card-header">
+                    <h5 class="mb-0">🔥 Top Sellers (Last 7 Days)</h5>
+                </div>
+                <div class="card-body">
+                    {% if top_items %}
+                    <table class="table table-sm">
+                        {% for item in top_items %}
+                        <tr>
+                            <td>{{ item.item__item_name }}</td>
+                            <td class="text-end">
+                                <strong>{{ item.total_sold }}</strong> sold
+                            </td>
+                        </tr>
+                        {% endfor %}
+                    </table>
+                    {% else %}
+                    <p class="text-muted mb-0">No sales yet this week</p>
+                    {% endif %}
+                </div>
+            </div>
+        </div>
+
+        <div class="col-md-6">
+            <div class="card">
+                <div class="card-header">
+                    <h5 class="mb-0">💰 Revenue (Last 7 Days)</h5>
+                </div>
+                <div class="card-body">
+                    <h3 class="text-success">
+                        ₹{{ total_revenue|floatformat:2 }}
+                    </h3>
+                    <p class="text-muted mb-0">
+                        Total from completed orders
+                    </p>
+                </div>
+            </div>
+        </div>
+    </div>
     <div class="row">
         <div class="col-12">
             <div class="card">
@@ -168,7 +213,7 @@
                             </tr>
                         </thead>
                         <tbody>
-                            {% for fb in Feedback.objects.filter(is_approved=False) %}
+                            {% for fb in pending_feedbacks_list %}
                             <tr>
                                 <td>{{ fb.user_name }}</td>
                                 <td>{{ fb.rating }}★</td>

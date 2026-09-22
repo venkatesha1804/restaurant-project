@@ -60,7 +60,7 @@
                   <p style="margin: 3px 0; font-size: 12px; color: #999;">Qty: {{ item.quantity }}</p>
                 </div>
                 <div style="text-align: right;">
-                  <p style="margin: 0; font-weight: 600;">${{ item.subtotal }}</p>
+                  <p style="margin: 0; font-weight: 600;">₹{{ item.subtotal }}</p>
                 </div>
               </div>
               {% endfor %}
@@ -86,7 +86,7 @@
             <div style="margin-bottom: 15px; padding-bottom: 10px; border-bottom: 1px solid #eee;">
               <div style="display: flex; justify-content: space-between; margin-bottom: 10px;">
                 <span>Subtotal ({{ total_items }} items):</span>
-                <strong>${{ order.total_amount }}</strong>
+                <strong>₹{{ order.total_amount }}</strong>
               </div>
               <div style="display: flex; justify-content: space-between; margin-bottom: 10px;">
                 <span>Delivery Charge:</span>
@@ -100,7 +100,7 @@
 
             <div style="display: flex; justify-content: space-between; font-size: 18px; margin-bottom: 20px;">
               <span style="font-weight: bold;">Total:</span>
-              <strong style="color: #ffbe33; font-size: 20px;">${{ order.total_amount }}</strong>
+              <strong style="color: #ffbe33; font-size: 20px;">₹{{ order.total_amount }}</strong>
             </div>
 
             <!-- Payment Status -->
